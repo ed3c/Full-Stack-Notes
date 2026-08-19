@@ -1,0 +1,42 @@
+name: node-bff-ci
+
+on:
+  pull_request:
+    paths:
+      - 'apps/bff/**'
+      - 'packages/contracts/openapi.json'
+      - 'scripts/validate_contracts.py'
+      - '.github/workflows/node-bff-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24.19.0'
+      - name: Install exact direct dependencies and bootstrap lockfile
+        working-directory: apps/bff
+        run: npm install --ignore-scripts
+      - name: Typecheck and test BFF
+        working-directory: apps/bff
+        run: npm run verify
+      - name: Validate frozen shared contracts
+        run: python scripts/validate_contracts.py
+      - name: Enforce BFF database boundary
+        shell: bash
+        run: |
+          if grep -R -n -E "from ['\"](pg|postgres|postgresql)|require\(['\"](pg|postgres|postgresql)|jdbc:|DATABASE_URL" apps/bff/src; then
+            echo 'BFF database-boundary violation detected'
+            exit 1
+          fi
+      - name: Preserve generated lockfile for deterministic follow-up
+        uses: actions/upload-artifact@v4
+        with:
+          name: node-bff-package-lock
+          path: apps/bff/package-lock.json
+          if-no-files-found: error
