@@ -2,9 +2,9 @@
 
 Evidence-first control plane and implementation portfolio for a **Full Stack Seed Engineer** role: end-to-end product delivery, Java and Node.js backend engineering, React product engineering, distributed-system resilience, and governed AI-assisted development.
 
-> Current evidence state: `FOUNDATION_DESIGN`.
+> Current evidence state: `FOUNDATION_VERIFIED` on draft PR [#24](https://github.com/ed3c/Full-Stack-Notes/pull/24).
 >
-> This repository does **not** yet prove a deployed MVP, production traffic, incident ownership, mentoring impact, or organization-wide AI adoption. Those states require implementation, test, runtime, incident, and human-review evidence.
+> Foundation contracts/governance are CI-verified; the product implementation is still not built. This repository does **not** yet prove a deployed MVP, production traffic, incident ownership, mentoring impact, or organization-wide AI adoption. Those states require implementation, runtime, incident, and human-review evidence.
 
 ## Target capability
 
@@ -79,8 +79,9 @@ Only `HUMAN_ADMITTED` evidence can be presented as proven experience from this r
 │   └── load/
 ├── docs/
 │   ├── architecture/           # system, dataflow, state machines, ADRs
+│   ├── evidence/               # evidence schema, audits, runs, projections
+│   ├── research/               # source registry / article-PDF-repo routing
 │   ├── role/                   # job-gap and interview evidence mapping
-│   ├── evidence/               # evidence schema + external projections
 │   ├── stack/                  # technology and license decisions
 │   └── stacked-prs/            # PR DAG / integration order
 └── .github/workflows/          # CI and evidence gates
@@ -90,18 +91,18 @@ Only `HUMAN_ADMITTED` evidence can be presented as proven experience from this r
 
 ```mermaid
 flowchart TD
-    F[PR-0 Foundation / contracts] --> J[PR-1 Java work-service]
-    F --> B[PR-2 Node BFF]
-    F --> W[PR-3 React UI]
-    J --> E[PR-4 outbox + Kafka + consumer]
-    B --> X[PR-5 E2E integration]
+    F[PR-0 / #16 Foundation + contracts] --> J[PR-1 / #17 Java work-service]
+    F --> B[PR-2 / #18 Node BFF]
+    F --> W[PR-3 / #19 React UI]
+    J --> E[PR-4 / #20 outbox + Kafka + consumer]
+    B --> X[PR-5 / #21 E2E integration]
     W --> X
     E --> X
-    X --> R[PR-6 resilience + failure drills]
-    R --> V[PR-7 runtime evidence + interview packet]
+    X --> R[PR-6 / #22 resilience + failure drills]
+    R --> V[PR-7 / #23 runtime evidence + interview packet]
 ```
 
-Each node becomes a GitHub issue/PR with explicit acceptance evidence. Parallel branches may exist only when contracts are frozen and paths do not overlap semantically.
+Parallel PR-1/2/3 work begins from the frozen PR-0 contract boundary; implementation capability states do not advance merely because PR-0 is verified.
 
 ## License
 
