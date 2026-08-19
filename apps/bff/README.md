@@ -10,7 +10,9 @@ This service owns web-edge policy for the Operations Work Queue. It does **not**
 - TypeScript `6.0.3` — Apache-2.0
 - `@types/node` `24.3.0` — MIT / DefinitelyTyped package
 
-The committed lockfile is the transitive dependency subject. CI must use `npm ci` after the lockfile bootstrap step is closed; unknown/reciprocal transitive licenses require review under `docs/stack/THIRD_PARTY_REPO_POLICY.md`.
+The committed `package-lock.json` is the exact transitive dependency subject and CI installs it with `npm ci --ignore-scripts`.
+
+Lockfile sanity review found no missing license metadata. Current license classes are MIT, BSD-3-Clause, ISC, and Apache-2.0. Dependency/version changes must repeat the repository-wide third-party review; this is an engineering record, not legal advice.
 
 ## Boundary
 
@@ -42,6 +44,7 @@ The downstream request has one absolute deadline (`UPSTREAM_TIMEOUT_MS`, default
 
 - GET: may retry network failures and HTTP 502/503/504.
 - mutation: the client requires `Idempotency-Key`; only then is retry eligibility allowed.
+- retryable mutation attempts preserve the same request ID and idempotency key.
 - max attempts: `UPSTREAM_MAX_ATTEMPTS`, default 2, hard-capped at 3.
 - 4xx/domain conflicts are never retried.
 - timeout is surfaced as a bounded typed edge failure, never false success.
@@ -59,12 +62,13 @@ On `SIGTERM` or `SIGINT`:
 1. readiness flips to draining;
 2. new work receives 503;
 3. Fastify closes and drains in-flight work;
-4. `SHUTDOWN_TIMEOUT_MS` bounds the drain; timeout forces non-zero exit.
+4. `SHUTDOWN_TIMEOUT_MS` bounds the drain; timeout forces non-zero exit;
+5. registered signal listeners have an explicit disposal path for clean test/process lifecycle ownership.
 
 ## Commands
 
 ```bash
-npm install
+npm ci --ignore-scripts
 npm run verify
 npm start
 ```
@@ -81,6 +85,20 @@ RATE_LIMIT_CAPACITY=20
 RATE_LIMIT_REFILL_PER_SECOND=10
 SHUTDOWN_TIMEOUT_MS=5000
 ```
+
+## Verified evidence
+
+Exact-head verification before this documentation-only update:
+
+- implementation head: `3b0f650a64c657e66fd396ecf0ef5944e4ace44d`
+- workflow: `node-bff-ci`
+- run: `32296356649`
+- deterministic `npm ci`: PASS
+- TypeScript + tests: PASS (`10/10`)
+- frozen shared contract validator: PASS
+- direct-database boundary gate: PASS
+
+This README update changes documentation only; the PR metadata carries the exact implementation/run receipt.
 
 ## Evidence ceiling
 
