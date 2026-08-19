@@ -22,7 +22,7 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 @Service
-public final class WorkItemService {
+public class WorkItemService {
     private static final String CREATE_OPERATION = "createWorkItem";
     private static final String TRANSITION_OPERATION = "transitionWorkItem";
 
