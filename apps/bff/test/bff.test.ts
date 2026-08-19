@@ -180,12 +180,10 @@ test('upstream deadline is bounded and exposed as a typed user-facing failure', 
       UpstreamTimeoutError
     );
 
-    const timeoutPort: WorkServicePort = {
-      ...new FakeWorkService(),
-      async list(): Promise<UpstreamResponse<WorkItemList>> {
-        throw new UpstreamTimeoutError();
-      }
-    } as WorkServicePort;
+    const timeoutPort = new FakeWorkService();
+    timeoutPort.list = async (): Promise<UpstreamResponse<WorkItemList>> => {
+      throw new UpstreamTimeoutError();
+    };
     const { app } = buildApp({ config: config(), client: timeoutPort, logger: false });
     const response = await app.inject({ method: 'GET', url: '/v1/work-items' });
     assert.equal(response.statusCode, 504);
@@ -219,19 +217,25 @@ test('draining flips readiness and bounded shutdown forces exit on timeout', asy
     10,
     (code) => { forcedExitCode = code; }
   );
-  await controller.handle('SIGTERM');
-  assert.equal(timeoutLifecycle.isReady(), false);
+
+  source.emit('SIGTERM');
+  await new Promise((resolve) => setTimeout(resolve, 30));
+  assert.equal(timeoutLifecycle.isDraining(), true);
   assert.equal(forcedExitCode, 1);
+  controller.dispose();
 });
 
 async function listen(server: Server): Promise<string> {
-  await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+  await new Promise<void>((resolve, reject) => {
+    server.once('error', reject);
+    server.listen(0, '127.0.0.1', () => resolve());
+  });
   const address = server.address() as AddressInfo;
   return `http://127.0.0.1:${address.port}`;
 }
 
 async function close(server: Server): Promise<void> {
   await new Promise<void>((resolve, reject) => {
-    server.close((error) => error === undefined ? resolve() : reject(error));
+    server.close((error) => error ? reject(error) : resolve());
   });
 }
