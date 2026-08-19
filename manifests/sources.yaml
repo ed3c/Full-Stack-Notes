@@ -1,0 +1,169 @@
+schema_version: 1
+observed_at: 2026-08-19
+
+sources:
+  - id: JD-FULLSTACK-SEED-2026-08-19
+    type: JOB_DESCRIPTION
+    title: Full Stack Engineer seed role
+    origin: user-supplied-current-conversation
+    authority: hiring-requirements
+    applicability: admitted-through-prd-requirements
+    evidence_ceiling: requirement-source-only
+    freshness: review-per-application
+
+  - id: INTERNAL-SKILLS-SHARED
+    type: USER_REPO
+    repository: ed3c/skills-shared
+    commit: 4ca9417b1da5ff32f1d4d3e7af64a15908749024
+    url: https://github.com/ed3c/skills-shared/commit/4ca9417b1da5ff32f1d4d3e7af64a15908749024
+    authority: reusable-tech-lead-shadow-and-stacked-delivery-methods
+    applicability: thin-binding-only
+    evidence_ceiling: method-contract-not-consumer-runtime
+    freshness: explicit-pin-update
+
+  - id: INTERNAL-RUNTIME-ENV
+    type: USER_REPO
+    repository: ed3c/runtime-env
+    commit: c0790b9a8c81d7eb45ed45ac3d761c7fad5baa9b
+    url: https://github.com/ed3c/runtime-env/commit/c0790b9a8c81d7eb45ed45ac3d761c7fad5baa9b
+    authority: secret-free-runtime-contract-plane
+    applicability: runtime-requirement-and-fixed-workload-projection
+    evidence_ceiling: resolved-contract-not-executed-workload
+    freshness: explicit-pin-update
+
+  - id: INTERNAL-AGENT-ARCHITECT-NOTES
+    type: USER_REPO
+    repository: ed3c/agent-architect-notes
+    commit: fab27455302841d165a15b95f3a649789e5373d1
+    url: https://github.com/ed3c/agent-architect-notes/commit/fab27455302841d165a15b95f3a649789e5373d1
+    authority: learning-and-interview-knowledge
+    applicability: reference-and-dashboard-routing
+    evidence_ceiling: learning-state-not-delivery-pulse-implementation
+    freshness: explicit-pin-update
+
+  - id: INTERNAL-WEBSITE-DESIGN-COMPILER
+    type: USER_REPO
+    repository: ed3c/website-design-compiler
+    commit: 4a79d9635911690950f02edda4505672ba7544f6
+    url: https://github.com/ed3c/website-design-compiler/commit/4a79d9635911690950f02edda4505672ba7544f6
+    authority: design-and-browser-evidence-reference
+    applicability: optional-reference-no-runtime-dependency
+    evidence_ceiling: exact-source-evidence-only
+    freshness: explicit-pin-update
+
+  - id: INTERNAL-SKILL-RESUME-SITE
+    type: USER_REPO
+    repository: ed3c/skill-resume-site
+    commit: f5b9b9d42ffa57db87b4755b36e63e4d0ef02b8c
+    url: https://github.com/ed3c/skill-resume-site/commit/f5b9b9d42ffa57db87b4755b36e63e4d0ef02b8c
+    authority: public-portfolio-projection
+    applicability: admitted-claims-only
+    evidence_ceiling: presentation-not-capability-authority
+    freshness: regenerate-after-claim-change
+
+  - id: OFFICIAL-NODE-RELEASES
+    type: OFFICIAL_DOC
+    url: https://nodejs.org/en/about/previous-releases
+    authority: Node.js release and LTS status
+    observed_fact: Node.js 24 is LTS; production should use Active or Maintenance LTS
+    applicability: apps/bff and Next.js runtime
+    evidence_ceiling: upstream-version-guidance
+    freshness: monthly-or-security-alert
+
+  - id: OFFICIAL-REACT-VERSIONS
+    type: OFFICIAL_DOC
+    url: https://react.dev/versions
+    authority: latest React major/minor documentation
+    observed_fact: latest documented version is React 19.2
+    applicability: apps/web
+    evidence_ceiling: upstream-version-guidance
+    freshness: monthly-or-security-alert
+
+  - id: OFFICIAL-NEXT-BLOG
+    type: OFFICIAL_DOC
+    url: https://nextjs.org/blog
+    authority: Next.js release and security channel
+    observed_fact: 16.3 is current; 16.2 is Active LTS and must use the latest patched 16.2.x
+    applicability: apps/web
+    evidence_ceiling: upstream-version-and-security-guidance
+    freshness: every-security-release
+
+  - id: OFFICIAL-SPRING-BOOT
+    type: OFFICIAL_DOC
+    url: https://docs.spring.io/spring-boot/index.html
+    authority: Spring Boot stable version documentation
+    observed_fact: stable lines include 4.1.0 and 3.5.16
+    applicability: services/delivery-core and workers/risk-projection
+    evidence_ceiling: upstream-version-guidance
+    freshness: monthly-or-security-alert
+
+  - id: OFFICIAL-JEP-444
+    type: OFFICIAL_SPEC
+    url: https://openjdk.org/jeps/444
+    authority: Java virtual-thread semantics
+    observed_fact: virtual threads are final in Java 21 and should not be pooled
+    applicability: Java threading design
+    evidence_ceiling: language-runtime-contract-not-application-performance
+    freshness: when-Java-baseline-changes
+
+  - id: OFFICIAL-POSTGRESQL-18
+    type: OFFICIAL_DOC
+    url: https://www.postgresql.org/docs/18/
+    authority: PostgreSQL 18 behavior and operations
+    applicability: canonical data plane
+    evidence_ceiling: upstream-database-contract
+    freshness: every-minor-security-release
+
+  - id: UPSTREAM-KAFKA
+    type: UPSTREAM_REPO
+    url: https://github.com/apache/kafka
+    license_expression: Apache-2.0
+    authority: Kafka source, release and license
+    applicability: asynchronous event plane
+    evidence_ceiling: upstream-capability-not-consumer-correctness
+    freshness: at-version-pin
+
+  - id: UPSTREAM-VALKEY
+    type: UPSTREAM_REPO
+    url: https://github.com/valkey-io/valkey
+    license_expression: BSD-3-Clause
+    authority: Valkey source, release and license
+    applicability: cache-and-rate-control-assist
+    evidence_ceiling: upstream-capability-not-consumer-correctness
+    freshness: at-version-pin
+
+  - id: UPSTREAM-OTEL-JAVA
+    type: UPSTREAM_REPO
+    url: https://github.com/open-telemetry/opentelemetry-java
+    license_expression: Apache-2.0
+    authority: Java telemetry API/SDK source and license
+    applicability: tracing-metrics-logs
+    evidence_ceiling: instrumentation-contract-not-observed-signal
+    freshness: at-version-pin
+
+  - id: UPSTREAM-PROMETHEUS
+    type: UPSTREAM_REPO
+    url: https://github.com/prometheus/prometheus
+    license_expression: Apache-2.0
+    authority: metrics runtime source and license
+    applicability: observability-runtime
+    evidence_ceiling: runtime-available-not-dashboard-or-slo-proof
+    freshness: at-version-pin
+
+  - id: UPSTREAM-JAEGER
+    type: UPSTREAM_REPO
+    url: https://github.com/jaegertracing/jaeger
+    license_expression: Apache-2.0
+    authority: trace runtime source and license
+    applicability: observability-runtime
+    evidence_ceiling: trace-tool-available-not-trace-correctness
+    freshness: at-version-pin
+
+  - id: UPSTREAM-LIQUIBASE-LICENSE
+    type: UPSTREAM_REPO
+    url: https://github.com/liquibase/liquibase
+    authority: current Liquibase Community license
+    observed_fact: current Community line uses Functional Source License with future Apache grant
+    applicability: contradiction-and-exclusion-record
+    evidence_ceiling: license-screening-only
+    freshness: before-any-admission
