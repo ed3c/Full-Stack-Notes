@@ -6,14 +6,14 @@ This directory is the implementation-routing index. The stack deliberately separ
 
 ```mermaid
 flowchart TD
-    P0[PR-0 Foundation + contracts]
-    P1[PR-1 Java work-service]
-    P2[PR-2 Node.js BFF]
-    P3[PR-3 React UI]
-    P4[PR-4 Outbox + Kafka + audit consumer]
-    P5[PR-5 End-to-end integration]
-    P6[PR-6 Resilience + failure drills]
-    P7[PR-7 Runtime evidence + interview packet]
+    P0[PR-0 / Issue #16 Foundation + contracts]
+    P1[PR-1 / Issue #17 Java work-service]
+    P2[PR-2 / Issue #18 Node.js BFF]
+    P3[PR-3 / Issue #19 React UI]
+    P4[PR-4 / Issue #20 Outbox + Kafka + audit consumer]
+    P5[PR-5 / Issue #21 End-to-end integration]
+    P6[PR-6 / Issue #22 Resilience + failure drills]
+    P7[PR-7 / Issue #23 Runtime evidence + interview packet]
 
     P0 --> P1
     P0 --> P2
@@ -29,16 +29,16 @@ flowchart TD
 
 ## Stack nodes
 
-| Node | Primary paths | Dependencies | Exit gate |
-|---|---|---|---|
-| PR-0 | `README.md`, `AGENTS.md`, `docs/**`, `packages/contracts/**`, foundation CI | none | contracts parse + smoke checks; issues/DAG exist |
-| PR-1 | `services/work-service/**` | PR-0 | Java domain/API persistence checks, duplicate create + concurrent transition tests |
-| PR-2 | `apps/bff/**` | PR-0 | typed contract client, validation, timeout/rate-limit/graceful-shutdown tests |
-| PR-3 | `apps/web/**` | PR-0 | create/list/transition UX with loading/error/stale-response tests |
-| PR-4 | `services/work-service/**`, `services/audit-consumer/**`, event infra/contracts when version-compatible | PR-1 | transactional outbox + duplicate-consumer + broker-recovery tests |
-| PR-5 | `infra/**`, `tests/contract/**`, `tests/e2e/**` | PR-1..4 | complete user journey executable against real DB/broker |
-| PR-6 | `tests/failure/**`, `tests/load/**`, telemetry/runbooks | PR-5 | minimum failure set executed with correlated telemetry |
-| PR-7 | `docs/evidence/runs/**`, interview/admission docs | PR-6 | Shadow Architect audit + human admission decision |
+| Node | GitHub issue | Primary paths | Dependencies | Exit gate |
+|---|---|---|---|---|
+| PR-0 | [#16](https://github.com/ed3c/Full-Stack-Notes/issues/16) | `README.md`, `AGENTS.md`, `docs/**`, `packages/contracts/**`, foundation CI | none | contracts parse + smoke checks; issues/DAG exist |
+| PR-1 | [#17](https://github.com/ed3c/Full-Stack-Notes/issues/17) | `services/work-service/**` | PR-0 | Java domain/API persistence checks, duplicate create + concurrent transition tests |
+| PR-2 | [#18](https://github.com/ed3c/Full-Stack-Notes/issues/18) | `apps/bff/**` | PR-0 | typed contract client, validation, timeout/rate-limit/graceful-shutdown tests |
+| PR-3 | [#19](https://github.com/ed3c/Full-Stack-Notes/issues/19) | `apps/web/**` | PR-0 | create/list/transition UX with loading/error/stale-response tests |
+| PR-4 | [#20](https://github.com/ed3c/Full-Stack-Notes/issues/20) | `services/work-service/**`, `services/audit-consumer/**`, event infra/contracts when version-compatible | PR-1 | transactional outbox + duplicate-consumer + broker-recovery tests |
+| PR-5 | [#21](https://github.com/ed3c/Full-Stack-Notes/issues/21) | `infra/**`, `tests/contract/**`, `tests/e2e/**` | PR-1..4 | complete user journey executable against real DB/broker |
+| PR-6 | [#22](https://github.com/ed3c/Full-Stack-Notes/issues/22) | `tests/failure/**`, `tests/load/**`, telemetry/runbooks | PR-5 | minimum failure set executed with correlated telemetry |
+| PR-7 | [#23](https://github.com/ed3c/Full-Stack-Notes/issues/23) | `docs/evidence/runs/**`, interview/admission docs | PR-6 | Shadow Architect audit + human admission decision |
 
 ## Parallelism rules
 
