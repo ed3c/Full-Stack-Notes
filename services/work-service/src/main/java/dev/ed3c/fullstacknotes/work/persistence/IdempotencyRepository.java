@@ -45,7 +45,8 @@ public final class IdempotencyRepository {
     public void complete(String key, String responseJson) {
         int rows = jdbc.sql("""
                         UPDATE idempotency_record
-                        SET response_json = CAST(:responseJson AS jsonb)
+                        SET response_json = CAST(:responseJson AS jsonb),
+                            completed_at = now()
                         WHERE idempotency_key = :key AND response_json IS NULL
                         """)
                 .param("responseJson", responseJson)
