@@ -88,6 +88,32 @@ def validate_event_schema(schema: dict[str, Any]) -> None:
     require("WorkItemTransitioned" in event_types, "WorkItemTransitioned event type missing")
     require("idempotencyKeyHash" in props, "event must define safe idempotency correlation semantics")
 
+    bindings: dict[str, str] = {}
+    for rule in schema.get("allOf", []):
+        event_type = (
+            rule.get("if", {})
+            .get("properties", {})
+            .get("eventType", {})
+            .get("const")
+        )
+        payload_ref = (
+            rule.get("then", {})
+            .get("properties", {})
+            .get("payload", {})
+            .get("$ref")
+        )
+        if isinstance(event_type, str) and isinstance(payload_ref, str):
+            bindings[event_type] = payload_ref
+
+    require(
+        bindings.get("WorkItemCreated") == "#/$defs/createdPayload",
+        "WorkItemCreated must be bound to createdPayload",
+    )
+    require(
+        bindings.get("WorkItemTransitioned") == "#/$defs/transitionedPayload",
+        "WorkItemTransitioned must be bound to transitionedPayload",
+    )
+
 
 def main() -> int:
     validate_openapi(load_json(OPENAPI))
