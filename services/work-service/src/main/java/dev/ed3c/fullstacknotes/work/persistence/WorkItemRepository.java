@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public final class WorkItemRepository {
+public class WorkItemRepository {
     private static final RowMapper<WorkItem> ROW_MAPPER = WorkItemRepository::map;
 
     private final JdbcClient jdbc;
