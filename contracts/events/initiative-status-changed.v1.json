@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ed3c/Full-Stack-Notes/contracts/events/initiative-status-changed.v1.json",
+  "title": "InitiativeStatusChangedV1",
+  "description": "Candidate durable event contract. Presence does not prove a producer, broker or consumer.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "eventId",
+    "eventType",
+    "schemaVersion",
+    "tenantId",
+    "aggregateType",
+    "aggregateId",
+    "aggregateVersion",
+    "partitionKey",
+    "occurredAt",
+    "traceparent",
+    "data"
+  ],
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "eventType": {
+      "const": "initiative.status-changed"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "tenantId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "aggregateType": {
+      "const": "initiative"
+    },
+    "aggregateId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "aggregateVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "partitionKey": {
+      "type": "string",
+      "description": "Must equal aggregateId; ordering is claimed only inside this key policy.",
+      "format": "uuid"
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "traceparent": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "correlationId": {
+      "type": ["string", "null"],
+      "maxLength": 128
+    },
+    "causationId": {
+      "type": ["string", "null"],
+      "maxLength": 128
+    },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "transitionId",
+        "actorId",
+        "fromState",
+        "toState",
+        "reason"
+      ],
+      "properties": {
+        "transitionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "actorId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "fromState": {
+          "type": ["string", "null"],
+          "enum": [null, "DRAFT", "READY", "IN_PROGRESS", "HANDOFF_PENDING", "BLOCKED", "DONE"]
+        },
+        "toState": {
+          "type": "string",
+          "enum": ["DRAFT", "READY", "IN_PROGRESS", "HANDOFF_PENDING", "BLOCKED", "DONE"]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "handoffOwnerId": {
+          "type": ["string", "null"],
+          "format": "uuid"
+        },
+        "dueAt": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "satisfiedConstraintIds": {
+          "type": "array",
+          "maxItems": 50,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      }
+    }
+  }
+}
