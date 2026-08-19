@@ -1,0 +1,85 @@
+name: java-work-service-ci
+
+on:
+  pull_request:
+    paths:
+      - "services/work-service/**"
+      - "scripts/smoke_work_service.py"
+      - ".github/workflows/java-work-service-ci.yml"
+  push:
+    branches: [main]
+    paths:
+      - "services/work-service/**"
+      - "scripts/smoke_work_service.py"
+      - ".github/workflows/java-work-service-ci.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_DB: workqueue
+          POSTGRES_USER: workqueue
+          POSTGRES_PASSWORD: workqueue
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U workqueue -d workqueue"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: jdbc:postgresql://127.0.0.1:5432/workqueue
+      DATABASE_USER: workqueue
+      DATABASE_PASSWORD: workqueue
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+          cache-dependency-path: services/work-service/pom.xml
+
+      - name: Unit and PostgreSQL integration tests
+        run: mvn -B -f services/work-service/pom.xml verify
+
+      - name: Start work-service
+        shell: bash
+        run: |
+          set -euo pipefail
+          java -jar services/work-service/target/work-service-0.1.0-SNAPSHOT.jar >/tmp/work-service.log 2>&1 &
+          echo $! >/tmp/work-service.pid
+          for attempt in $(seq 1 45); do
+            if curl -fsS "http://127.0.0.1:8080/v1/work-items?limit=1" >/dev/null; then
+              exit 0
+            fi
+            if ! kill -0 "$(cat /tmp/work-service.pid)" 2>/dev/null; then
+              cat /tmp/work-service.log
+              exit 1
+            fi
+            sleep 1
+          done
+          cat /tmp/work-service.log
+          exit 1
+
+      - name: HTTP contract and idempotency smoke
+        run: python3 scripts/smoke_work_service.py
+
+      - name: Show service log on failure
+        if: failure()
+        run: cat /tmp/work-service.log || true
+
+      - name: Stop work-service
+        if: always()
+        run: |
+          if [[ -f /tmp/work-service.pid ]]; then
+            kill "$(cat /tmp/work-service.pid)" 2>/dev/null || true
+          fi
