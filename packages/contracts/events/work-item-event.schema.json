@@ -28,6 +28,26 @@
       ]
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"eventType": {"const": "WorkItemCreated"}},
+        "required": ["eventType"]
+      },
+      "then": {
+        "properties": {"payload": {"$ref": "#/$defs/createdPayload"}}
+      }
+    },
+    {
+      "if": {
+        "properties": {"eventType": {"const": "WorkItemTransitioned"}},
+        "required": ["eventType"]
+      },
+      "then": {
+        "properties": {"payload": {"$ref": "#/$defs/transitionedPayload"}}
+      }
+    }
+  ],
   "$defs": {
     "status": {
       "type": "string",
