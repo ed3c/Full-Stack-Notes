@@ -23,8 +23,8 @@ const POLICY = {
 
 test('mutation retry keeps the same idempotency key and request ID across retryable attempts', async () => {
   let attempts = 0;
-  const idempotencyKeys: Array<string | undefined> = [];
-  const requestIds: Array<string | undefined> = [];
+  const idempotencyKeys: Array<string | string[] | undefined> = [];
+  const requestIds: Array<string | string[] | undefined> = [];
   const server = createServer((request, response) => {
     attempts += 1;
     idempotencyKeys.push(request.headers['idempotency-key']);
