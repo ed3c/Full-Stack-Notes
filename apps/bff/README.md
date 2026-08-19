@@ -88,17 +88,13 @@ SHUTDOWN_TIMEOUT_MS=5000
 
 ## Verified evidence
 
-Exact-head verification before this documentation-only update:
-
-- implementation head: `3b0f650a64c657e66fd396ecf0ef5944e4ace44d`
+- exact head: `9fbc0c537eab4b999f8a86654df05fcfd3dcefdf`
 - workflow: `node-bff-ci`
-- run: `32296356649`
+- run: `32296490771`
 - deterministic `npm ci`: PASS
 - TypeScript + tests: PASS (`10/10`)
 - frozen shared contract validator: PASS
 - direct-database boundary gate: PASS
-
-This README update changes documentation only; the PR metadata carries the exact implementation/run receipt.
 
 ## Evidence ceiling
 
