@@ -1,10 +1,14 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "source": {
     "id": "JD-FULLSTACK-SEED-2026-08-19",
     "type": "JOB_DESCRIPTION",
-    "observed_at": "2026-08-19"
+    "observed_at": "2026-08-19",
+    "source_intake_issue": 15
   },
+  "repository": "ed3c/Full-Stack-Notes",
+  "convergence_issue": 2,
+  "bootstrap_pull_request": 1,
   "status_vocabulary": [
     "DEFINED",
     "NOT_IMPLEMENTED",
@@ -16,41 +20,280 @@
     "HUMAN_ADMIT_REQUIRED"
   ],
   "canonical_detail": "docs/role/ROLE_EVIDENCE_MATRIX.md",
+  "capability_dag": "docs/architecture/STACK_DAG.md",
   "controls": "docs/operations/FAILURE_EXPERIENCE_CATALOG.md",
   "requirements": [
-    {"id":"FS-ROLE-001","priority":"P0","owner":"cross-plane","state":"DEFINED","issue":null},
-    {"id":"FS-ROLE-002","priority":"P0","owner":"ai-governance","state":"DEFINED","issue":null},
-    {"id":"FS-ROLE-003","priority":"P0","owner":"product","state":"DEFINED","issue":null},
-    {"id":"FS-ROLE-004","priority":"P1","owner":"enablement","state":"DEFINED","issue":null},
-    {"id":"FS-ROLE-005","priority":"P1","owner":"product-ops","state":"DEFINED","issue":null},
-    {"id":"FS-ROLE-006","priority":"P0","owner":"cross-plane","state":"DEFINED","issue":null},
-    {"id":"FS-BE-001","priority":"P0","owner":"delivery-core","state":"DEFINED","issue":null},
-    {"id":"FS-BE-002","priority":"P0","owner":"delivery-core","state":"DEFINED","issue":null},
-    {"id":"FS-BE-003","priority":"P0","owner":"delivery-core","state":"DEFINED","issue":null},
-    {"id":"FS-BE-004","priority":"P0","owner":"async","state":"DEFINED","issue":null},
-    {"id":"FS-BE-005","priority":"P0","owner":"async","state":"DEFINED","issue":null},
-    {"id":"FS-BE-006","priority":"P1","owner":"runtime","state":"DEFINED","issue":null},
-    {"id":"FS-BE-007","priority":"P0","owner":"bff-and-core","state":"DEFINED","issue":null},
-    {"id":"FS-BE-008","priority":"P0","owner":"delivery-core","state":"DEFINED","issue":null},
-    {"id":"FS-NODE-001","priority":"P0","owner":"bff","state":"DEFINED","issue":null},
-    {"id":"FS-NODE-002","priority":"P0","owner":"bff","state":"DEFINED","issue":null},
-    {"id":"FS-NODE-003","priority":"P0","owner":"architecture","state":"DEFINED","issue":null},
-    {"id":"FS-FE-001","priority":"P0","owner":"web","state":"DEFINED","issue":null},
-    {"id":"FS-FE-002","priority":"P1","owner":"web","state":"DEFINED","issue":null},
-    {"id":"FS-FE-003","priority":"P0","owner":"web","state":"DEFINED","issue":null},
-    {"id":"FS-FE-004","priority":"P0","owner":"web","state":"DEFINED","issue":null},
-    {"id":"FS-FE-005","priority":"P0","owner":"web","state":"DEFINED","issue":null},
-    {"id":"FS-FE-006","priority":"P0","owner":"web","state":"DEFINED","issue":null},
-    {"id":"FS-FE-007","priority":"P0","owner":"web-performance","state":"DEFINED","issue":null},
-    {"id":"FS-FE-008","priority":"P1","owner":"observability","state":"DEFINED","issue":null},
-    {"id":"FS-DATA-001","priority":"P0","owner":"data","state":"DEFINED","issue":null},
-    {"id":"FS-DATA-002","priority":"P0","owner":"data","state":"DEFINED","issue":null},
-    {"id":"FS-PROD-001","priority":"P0","owner":"runtime","state":"DEFINED","issue":null},
-    {"id":"FS-PROD-002","priority":"P0","owner":"operations","state":"DEFINED","issue":null},
-    {"id":"FS-PROD-003","priority":"P0","owner":"security","state":"DEFINED","issue":null},
-    {"id":"FS-AI-001","priority":"P0","owner":"ai-governance","state":"DEFINED","issue":null},
-    {"id":"FS-AI-002","priority":"P0","owner":"ai-governance","state":"DEFINED","issue":null},
-    {"id":"FS-AI-003","priority":"P1","owner":"enablement","state":"DEFINED","issue":null},
-    {"id":"FS-AI-004","priority":"P0","owner":"ai-governance","state":"DEFINED","issue":null}
+    {
+      "id": "FS-ROLE-001",
+      "priority": "P0",
+      "owner": "cross-plane",
+      "state": "DEFINED",
+      "primary_issue": 4,
+      "supporting_issues": [5, 6, 7, 8]
+    },
+    {
+      "id": "FS-ROLE-002",
+      "priority": "P0",
+      "owner": "ai-governance",
+      "state": "DEFINED",
+      "primary_issue": 11,
+      "supporting_issues": []
+    },
+    {
+      "id": "FS-ROLE-003",
+      "priority": "P0",
+      "owner": "product",
+      "state": "DEFINED",
+      "primary_issue": 3,
+      "supporting_issues": [4, 15]
+    },
+    {
+      "id": "FS-ROLE-004",
+      "priority": "P1",
+      "owner": "enablement",
+      "state": "DEFINED",
+      "primary_issue": 13,
+      "supporting_issues": [11]
+    },
+    {
+      "id": "FS-ROLE-005",
+      "priority": "P1",
+      "owner": "product-ops",
+      "state": "DEFINED",
+      "primary_issue": 13,
+      "supporting_issues": [9]
+    },
+    {
+      "id": "FS-ROLE-006",
+      "priority": "P0",
+      "owner": "cross-plane",
+      "state": "DEFINED",
+      "primary_issue": 12,
+      "supporting_issues": [4, 10]
+    },
+    {
+      "id": "FS-BE-001",
+      "priority": "P0",
+      "owner": "delivery-core",
+      "state": "DEFINED",
+      "primary_issue": 5,
+      "supporting_issues": [4]
+    },
+    {
+      "id": "FS-BE-002",
+      "priority": "P0",
+      "owner": "delivery-core",
+      "state": "DEFINED",
+      "primary_issue": 5,
+      "supporting_issues": [9, 10]
+    },
+    {
+      "id": "FS-BE-003",
+      "priority": "P0",
+      "owner": "delivery-core",
+      "state": "DEFINED",
+      "primary_issue": 5,
+      "supporting_issues": [10]
+    },
+    {
+      "id": "FS-BE-004",
+      "priority": "P0",
+      "owner": "async",
+      "state": "DEFINED",
+      "primary_issue": 8,
+      "supporting_issues": [10]
+    },
+    {
+      "id": "FS-BE-005",
+      "priority": "P0",
+      "owner": "async",
+      "state": "DEFINED",
+      "primary_issue": 8,
+      "supporting_issues": [9, 10]
+    },
+    {
+      "id": "FS-BE-006",
+      "priority": "P1",
+      "owner": "runtime",
+      "state": "DEFINED",
+      "primary_issue": 12,
+      "supporting_issues": [9, 10]
+    },
+    {
+      "id": "FS-BE-007",
+      "priority": "P0",
+      "owner": "bff-and-core",
+      "state": "DEFINED",
+      "primary_issue": 7,
+      "supporting_issues": [5, 9, 10]
+    },
+    {
+      "id": "FS-BE-008",
+      "priority": "P0",
+      "owner": "delivery-core",
+      "state": "DEFINED",
+      "primary_issue": 5,
+      "supporting_issues": [8, 10]
+    },
+    {
+      "id": "FS-NODE-001",
+      "priority": "P0",
+      "owner": "bff",
+      "state": "DEFINED",
+      "primary_issue": 7,
+      "supporting_issues": [4]
+    },
+    {
+      "id": "FS-NODE-002",
+      "priority": "P0",
+      "owner": "bff",
+      "state": "DEFINED",
+      "primary_issue": 7,
+      "supporting_issues": [9, 10]
+    },
+    {
+      "id": "FS-NODE-003",
+      "priority": "P0",
+      "owner": "architecture",
+      "state": "DEFINED",
+      "primary_issue": 7,
+      "supporting_issues": [3]
+    },
+    {
+      "id": "FS-FE-001",
+      "priority": "P0",
+      "owner": "web",
+      "state": "DEFINED",
+      "primary_issue": 6,
+      "supporting_issues": [4]
+    },
+    {
+      "id": "FS-FE-002",
+      "priority": "P1",
+      "owner": "web",
+      "state": "DEFINED",
+      "primary_issue": 6,
+      "supporting_issues": []
+    },
+    {
+      "id": "FS-FE-003",
+      "priority": "P0",
+      "owner": "web",
+      "state": "DEFINED",
+      "primary_issue": 6,
+      "supporting_issues": [8]
+    },
+    {
+      "id": "FS-FE-004",
+      "priority": "P0",
+      "owner": "web",
+      "state": "DEFINED",
+      "primary_issue": 6,
+      "supporting_issues": [3, 4]
+    },
+    {
+      "id": "FS-FE-005",
+      "priority": "P0",
+      "owner": "web",
+      "state": "DEFINED",
+      "primary_issue": 6,
+      "supporting_issues": [3]
+    },
+    {
+      "id": "FS-FE-006",
+      "priority": "P0",
+      "owner": "web",
+      "state": "DEFINED",
+      "primary_issue": 6,
+      "supporting_issues": []
+    },
+    {
+      "id": "FS-FE-007",
+      "priority": "P0",
+      "owner": "web-performance",
+      "state": "DEFINED",
+      "primary_issue": 6,
+      "supporting_issues": [9, 10]
+    },
+    {
+      "id": "FS-FE-008",
+      "priority": "P1",
+      "owner": "observability",
+      "state": "DEFINED",
+      "primary_issue": 9,
+      "supporting_issues": [6]
+    },
+    {
+      "id": "FS-DATA-001",
+      "priority": "P0",
+      "owner": "data",
+      "state": "DEFINED",
+      "primary_issue": 5,
+      "supporting_issues": [4]
+    },
+    {
+      "id": "FS-DATA-002",
+      "priority": "P0",
+      "owner": "data",
+      "state": "DEFINED",
+      "primary_issue": 12,
+      "supporting_issues": [5, 10]
+    },
+    {
+      "id": "FS-PROD-001",
+      "priority": "P0",
+      "owner": "runtime",
+      "state": "DEFINED",
+      "primary_issue": 12,
+      "supporting_issues": [10, 14]
+    },
+    {
+      "id": "FS-PROD-002",
+      "priority": "P0",
+      "owner": "operations",
+      "state": "DEFINED",
+      "primary_issue": 10,
+      "supporting_issues": [9, 12]
+    },
+    {
+      "id": "FS-PROD-003",
+      "priority": "P0",
+      "owner": "security",
+      "state": "DEFINED",
+      "primary_issue": 5,
+      "supporting_issues": [7, 10]
+    },
+    {
+      "id": "FS-AI-001",
+      "priority": "P0",
+      "owner": "ai-governance",
+      "state": "DEFINED",
+      "primary_issue": 11,
+      "supporting_issues": [3]
+    },
+    {
+      "id": "FS-AI-002",
+      "priority": "P0",
+      "owner": "ai-governance",
+      "state": "DEFINED",
+      "primary_issue": 11,
+      "supporting_issues": [10]
+    },
+    {
+      "id": "FS-AI-003",
+      "priority": "P1",
+      "owner": "enablement",
+      "state": "DEFINED",
+      "primary_issue": 13,
+      "supporting_issues": [11]
+    },
+    {
+      "id": "FS-AI-004",
+      "priority": "P0",
+      "owner": "ai-governance",
+      "state": "DEFINED",
+      "primary_issue": 11,
+      "supporting_issues": [3]
+    }
   ]
 }
