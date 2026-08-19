@@ -181,14 +181,53 @@ Public repositories may expose sanitized capability evidence. Private repositori
 
 See [`docs/governance/EVIDENCE_ROUTING.md`](docs/governance/EVIDENCE_ROUTING.md).
 
+## Execution and molecular Stack index
+
+- Bootstrap control-plane candidate: [draft PR #1](https://github.com/ed3c/Full-Stack-Notes/pull/1)
+- Global convergence and Human Admit: [issue #2](https://github.com/ed3c/Full-Stack-Notes/issues/2)
+- Contract, traceability and hollow-evidence gate: [issue #3](https://github.com/ed3c/Full-Stack-Notes/issues/3)
+- Runnable React–Node–Java–PostgreSQL scaffold: [issue #4](https://github.com/ed3c/Full-Stack-Notes/issues/4)
+- Java domain, transaction and concurrency: [issue #5](https://github.com/ed3c/Full-Stack-Notes/issues/5)
+- React product, accessibility and rendering evidence: [issue #6](https://github.com/ed3c/Full-Stack-Notes/issues/6)
+- Node BFF, deadlines, rate limits and SSE cleanup: [issue #7](https://github.com/ed3c/Full-Stack-Notes/issues/7)
+- Outbox, Kafka, projection and SSE replay: [issue #8](https://github.com/ed3c/Full-Stack-Notes/issues/8)
+- Observability, load and performance/SLO calibration: [issue #9](https://github.com/ed3c/Full-Stack-Notes/issues/9)
+- Failure, recovery, migration and rollback game-day: [issue #10](https://github.com/ed3c/Full-Stack-Notes/issues/10)
+- Governed AI-assisted candidate/reviewer/falsifier evidence: [issue #11](https://github.com/ed3c/Full-Stack-Notes/issues/11)
+- Immutable production-like deployment and multi-instance operations: [issue #12](https://github.com/ed3c/Full-Stack-Notes/issues/12)
+- Zero-context seed exercise and external projections: [issue #13](https://github.com/ed3c/Full-Stack-Notes/issues/13)
+- Truthful professional production-story inventory: [issue #14](https://github.com/ed3c/Full-Stack-Notes/issues/14)
+- Article, PDF, repository and stack-source intake: [issue #15](https://github.com/ed3c/Full-Stack-Notes/issues/15)
+
+The complete capability DAG, path leases, relation vocabulary and proposed molecular branch topology are in [`docs/architecture/STACK_DAG.md`](docs/architecture/STACK_DAG.md). [`prd/requirements.json`](prd/requirements.json) binds every `FS-*` requirement to a primary and supporting issue.
+
+```text
+#3 contract gate
+→ #4 runnable scaffold
+→ #5 Java / #6 React / #7 Node siblings
+→ #8 asynchronous closure
+→ #9 measurable evidence
+→ #10 game-day and #12 runtime proof
+→ #13 seed/projection
+→ #2 convergence and Human Admit
+
+parallel independent lanes:
+#11 AI evidence
+#14 authentic human experience
+#15 source intake
+```
+
+Issue order is not Git ancestry. Use a true child PR only when it consumes named unmerged parent bytes; otherwise branch from the same admitted base as a sibling or wait for the predecessor to merge.
+
 ## Agent and reviewer route
 
 1. [`AGENTS.md`](AGENTS.md)
 2. [`prd/requirements.json`](prd/requirements.json)
 3. [`docs/architecture/README.md`](docs/architecture/README.md)
-4. [`docs/role/ROLE_EVIDENCE_MATRIX.md`](docs/role/ROLE_EVIDENCE_MATRIX.md)
-5. [`docs/governance/SHADOW_ARCHITECT_LEDGER.md`](docs/governance/SHADOW_ARCHITECT_LEDGER.md)
-6. exact issue, PR base/head, checks, receipts, and closest directory instructions
+4. [`docs/architecture/STACK_DAG.md`](docs/architecture/STACK_DAG.md)
+5. [`docs/role/ROLE_EVIDENCE_MATRIX.md`](docs/role/ROLE_EVIDENCE_MATRIX.md)
+6. [`docs/governance/SHADOW_ARCHITECT_LEDGER.md`](docs/governance/SHADOW_ARCHITECT_LEDGER.md)
+7. exact issue, PR base/head, checks, receipts, and closest directory instructions
 
 ## Current truthful status
 
@@ -196,7 +235,8 @@ See [`docs/governance/EVIDENCE_ROUTING.md`](docs/governance/EVIDENCE_ROUTING.md)
 repository baseline                    PASS
 Apache-2.0 repository license          PASS
 role/control-plane candidate           DEFINED_ON_DRAFT_BRANCH
-requirements and contracts             CANDIDATE
+requirements and issue ownership       BOUND
+contracts                              CANDIDATE_UNVALIDATED
 MVP application code                   NOT_IMPLEMENTED
 CI and deterministic proof             NOT_EXERCISED
 live deployment                         NOT_EXERCISED
