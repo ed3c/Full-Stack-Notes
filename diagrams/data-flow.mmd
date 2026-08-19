@@ -1,0 +1,89 @@
+flowchart LR
+    USER[Product delivery owner]
+
+    subgraph Browser[Browser plane]
+      WEB[Next.js / React]
+      UI_STATE[URL + server + local + SSE cursor state]
+    end
+
+    subgraph Edge[Node.js web edge]
+      BFF[Fastify BFF]
+      AUTH[Session + authorization context]
+      LIMIT[Tenant/global admission budgets]
+      SSE[SSE replay gateway]
+    end
+
+    subgraph Core[Java domain plane]
+      API[Spring Boot command/query API]
+      POLICY[Workflow + authorization policy]
+      IDEM[Idempotency registry]
+      TX[Aggregate + audit + outbox transaction]
+      RELAY[Bounded outbox relay]
+    end
+
+    subgraph Async[Asynchronous plane]
+      KAFKA[(Kafka)]
+      WORKER[Risk projection consumer]
+      INBOX[Consumer inbox]
+      TERMINAL[Terminal topic / replay queue]
+    end
+
+    subgraph Data[Data plane]
+      PG[(PostgreSQL)]
+      OUTBOX[(Outbox)]
+      PROJECTION[(Risk projection)]
+      VALKEY[(Valkey)]
+    end
+
+    subgraph Evidence[Observability and proof]
+      OTEL[OpenTelemetry Collector]
+      PROM[Prometheus]
+      JAEGER[Jaeger]
+      RECEIPTS[Exact evidence receipts]
+    end
+
+    subgraph Faults[Controlled faults]
+      TOXI[Toxiproxy]
+      LOAD[Load/browser/game-day harness]
+    end
+
+    USER --> WEB
+    WEB --> UI_STATE
+    WEB -->|HTTP + traceparent| BFF
+    BFF --> AUTH
+    BFF --> LIMIT
+    LIMIT --> VALKEY
+    BFF -->|typed request + absolute deadline| API
+    API --> POLICY
+    POLICY --> IDEM
+    POLICY --> TX
+    TX --> PG
+    TX --> OUTBOX
+    OUTBOX --> RELAY
+    RELAY -->|key = initiativeId| KAFKA
+    KAFKA --> WORKER
+    WORKER --> INBOX
+    INBOX --> PG
+    WORKER --> PROJECTION
+    PROJECTION --> PG
+    WORKER -->|bounded terminal route| TERMINAL
+    KAFKA --> SSE
+    SSE -->|event id + cursor/replay/reset| WEB
+
+    WEB -. signal .-> OTEL
+    BFF -. signal .-> OTEL
+    API -. signal .-> OTEL
+    RELAY -. signal .-> OTEL
+    WORKER -. signal .-> OTEL
+    OTEL --> PROM
+    OTEL --> JAEGER
+    PROM --> RECEIPTS
+    JAEGER --> RECEIPTS
+
+    TOXI -. latency/reset/partition .-> PG
+    TOXI -. latency/reset/partition .-> KAFKA
+    TOXI -. latency/reset/partition .-> VALKEY
+    LOAD -. declared workload .-> WEB
+    LOAD -. exact result .-> RECEIPTS
+
+    RECEIPTS -->|Human Admit only| CLAIM[Portfolio/interview claim]
