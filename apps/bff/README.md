@@ -86,15 +86,17 @@ RATE_LIMIT_REFILL_PER_SECOND=10
 SHUTDOWN_TIMEOUT_MS=5000
 ```
 
-## Verified evidence
+## Verification contract
 
-- exact head: `9fbc0c537eab4b999f8a86654df05fcfd3dcefdf`
-- workflow: `node-bff-ci`
-- run: `32296490771`
-- deterministic `npm ci`: PASS
-- TypeScript + tests: PASS (`10/10`)
-- frozen shared contract validator: PASS
-- direct-database boundary gate: PASS
+The BFF is eligible for `VERIFIED` only when the exact PR head passes all of these gates:
+
+- deterministic `npm ci` from the committed lockfile;
+- TypeScript compile + behavior tests;
+- frozen shared contract validator;
+- direct-database boundary gate;
+- Shadow Architect closure review.
+
+Exact head SHA and workflow run IDs are recorded in PR #28 / issue #18 rather than in this file. This avoids a self-referential receipt where committing the receipt changes the subject SHA.
 
 ## Evidence ceiling
 
