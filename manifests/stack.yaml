@@ -1,0 +1,200 @@
+schema_version: 1
+observed_at: 2026-08-19
+policy: docs/governance/COMMERCIAL_REPO_ALLOWLIST.md
+
+architecture_style:
+  baseline: modular-monolith-plus-web-edge-and-async-worker
+  prohibited_default: resume-driven-microservices
+  extraction_gate: ADR-with-measured-ownership-scale-availability-or-release-need
+
+components:
+  - id: java-runtime
+    selection: Java
+    version_policy: 21-baseline-with-25-ci-compatibility-lane
+    role: delivery-core-and-risk-worker-runtime
+    license_expression: GPL-2.0-only-WITH-Classpath-exception-2.0
+    policy_class: RUNTIME_BOUNDARY
+    implementation_state: NOT_IMPLEMENTED
+    evidence_state: NOT_EXERCISED
+
+  - id: spring-boot
+    selection: spring-projects/spring-boot
+    version_policy: 4.1.x-pinned-by-BOM
+    observed_version: 4.1.0
+    role: Java application framework
+    license_expression: Apache-2.0
+    policy_class: PERMISSIVE_BASELINE
+    implementation_state: NOT_IMPLEMENTED
+    evidence_state: NOT_EXERCISED
+
+  - id: node-runtime
+    selection: nodejs/node
+    version_policy: 24-LTS-latest-security-patch
+    observed_version: 24.19.0
+    role: BFF-and-Next-runtime
+    license_expression: MIT
+    policy_class: PERMISSIVE_BASELINE
+    implementation_state: NOT_IMPLEMENTED
+    evidence_state: NOT_EXERCISED
+
+  - id: react
+    selection: facebook/react
+    version_policy: 19.2-latest-compatible-patch
+    observed_version: "19.2"
+    role: browser-product-runtime
+    license_expression: MIT
+    policy_class: PERMISSIVE_BASELINE
+    implementation_state: NOT_IMPLEMENTED
+    evidence_state: NOT_EXERCISED
+
+  - id: nextjs
+    selection: vercel/next.js
+    version_policy: 16.2-active-lts-latest-security-patch
+    observed_version: 16.2.11
+    current-nonbaseline-observed: "16.3"
+    role: rendering-routing-and-web-build
+    license_expression: MIT
+    policy_class: PERMISSIVE_BASELINE
+    implementation_state: NOT_IMPLEMENTED
+    evidence_state: NOT_EXERCISED
+    decision: prefer-currently-patched-LTS-over-current-feature-line
+
+  - id: fastify
+    selection: fastify/fastify
+    version_policy: exact-compatible-major-and-patch-after-scaffold
+    role: Node.js BFF
+    license_expression: MIT
+    policy_class: PERMISSIVE_BASELINE
+    implementation_state: NOT_IMPLEMENTED
+    evidence_state: NOT_EXERCISED
+    shadow_risk: separate-BFF-may-be-unjustified-after-first-slice
+
+  - id: postgresql
+    selection: PostgreSQL
+    version_policy: 18-latest-security-patch
+    observed_version: "18"
+    role: canonical-domain-and-projection-data
+    license_expression: PostgreSQL
+    policy_class: PERMISSIVE_BASELINE
+    implementation_state: NOT_IMPLEMENTED
+    evidence_state: NOT_EXERCISED
+
+  - id: flyway-core
+    selection: flyway/flyway-core-and-postgresql-module
+    version_policy: exact-module-version-after-SBOM-review
+    role: database-migration
+    license_expression: Apache-2.0
+    policy_class: PERMISSIVE_BASELINE_WITH_PIN
+    implementation_state: NOT_IMPLEMENTED
+    evidence_state: NOT_EXERCISED
+    exclusion: current-Liquibase-Community-FSL
+
+  - id: kafka
+    selection: apache/kafka
+    version_policy: exact-supported-release-after-client-broker-compatibility-review
+    role: durable-asynchronous-event-transport
+    license_expression: Apache-2.0
+    policy_class: PERMISSIVE_BASELINE
+    implementation_state: NOT_IMPLEMENTED
+    evidence_state: NOT_EXERCISED
+
+  - id: valkey
+    selection: valkey-io/valkey
+    version_policy: exact-supported-release-and-image-digest
+    role: bounded-cache-session-and-rate-control-assist
+    license_expression: BSD-3-Clause
+    policy_class: PERMISSIVE_BASELINE
+    implementation_state: NOT_IMPLEMENTED
+    evidence_state: NOT_EXERCISED
+    exclusion: current-Redis-license-complexity
+
+  - id: resilience4j
+    selection: resilience4j/resilience4j
+    version_policy: v3-compatible-with-Java-21
+    role: circuit-breaker-retry-rate-limiter-bulkhead
+    license_expression: Apache-2.0
+    policy_class: PERMISSIVE_BASELINE
+    implementation_state: NOT_IMPLEMENTED
+    evidence_state: NOT_EXERCISED
+
+  - id: opentelemetry
+    selection: OpenTelemetry-Java-and-Collector
+    version_policy: exact-compatible-release-and-image-digest
+    role: vendor-neutral-trace-metric-log-pipeline
+    license_expression: Apache-2.0
+    policy_class: PERMISSIVE_BASELINE
+    implementation_state: NOT_IMPLEMENTED
+    evidence_state: NOT_EXERCISED
+
+  - id: prometheus
+    selection: prometheus/prometheus
+    version_policy: exact-image-digest
+    role: metrics-query-and-alert-source
+    license_expression: Apache-2.0
+    policy_class: PERMISSIVE_BASELINE
+    implementation_state: NOT_IMPLEMENTED
+    evidence_state: NOT_EXERCISED
+
+  - id: jaeger
+    selection: jaegertracing/jaeger
+    version_policy: exact-image-digest
+    role: trace-exploration
+    license_expression: Apache-2.0
+    policy_class: PERMISSIVE_BASELINE
+    implementation_state: NOT_IMPLEMENTED
+    evidence_state: NOT_EXERCISED
+    exclusion: Grafana-is-not-required-for-first-proof
+
+  - id: testcontainers
+    selection: testcontainers/testcontainers-java
+    version_policy: exact-release
+    role: real-boundary-integration-tests
+    license_expression: MIT
+    policy_class: PERMISSIVE_BASELINE
+    implementation_state: NOT_IMPLEMENTED
+    evidence_state: NOT_EXERCISED
+
+  - id: playwright
+    selection: microsoft/playwright
+    version_policy: exact-release-and-browser-binaries
+    role: browser-acceptance-accessibility-and-trace
+    license_expression: Apache-2.0
+    policy_class: PERMISSIVE_BASELINE
+    implementation_state: NOT_IMPLEMENTED
+    evidence_state: NOT_EXERCISED
+
+  - id: toxiproxy
+    selection: Shopify/toxiproxy
+    version_policy: exact-release-and-image-digest
+    role: dependency-latency-reset-and-partition-injection
+    license_expression: MIT
+    policy_class: PERMISSIVE_BASELINE
+    implementation_state: NOT_IMPLEMENTED
+    evidence_state: NOT_EXERCISED
+
+excluded_or_deferred:
+  - component: Go
+    reason: job-requirement-is-Java-or-Go; depth-in-one-core-stack-is-higher-value
+    revisit_on: measured-worker-runtime-need
+  - component: Kubernetes
+    reason: first-close-product-and-failure-loop-with-Compose
+    revisit_on: multi-instance-service-discovery-and-load-balancing-issue
+  - component: Grafana
+    reason: AGPL-default-and-not-needed-for-first-proof
+    revisit_on: explicit-operations-and-legal-review
+  - component: Liquibase-current-community
+    reason: current-FSL-license
+    revisit_on: exact-version-and-legal-decision
+  - component: Redis-current
+    reason: multi-license-complexity
+    replacement: Valkey
+
+required_pin_fields_before_build:
+  - exact-version
+  - source-url
+  - commit-or-image-digest
+  - direct-and-transitive-license-inventory
+  - notice-obligations
+  - security-advisory-state
+  - compatibility-test-subject
+  - owning-issue
