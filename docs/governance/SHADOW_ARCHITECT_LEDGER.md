@@ -2,31 +2,36 @@
 
 ## Monitor contract
 
-The Shadow Architect is a read-only pre-side-effect and close-gate reviewer. It does not edit Builder paths, merge, deploy, resolve semantic conflicts, expose secrets, change repository visibility, or promote deterministic evidence into runtime/production evidence.
+The Shadow Architect is a read-only pre-side-effect and close-gate reviewer. It does not edit Builder implementation paths, merge, deploy, resolve semantic conflicts, expose secrets, change repository visibility, or promote deterministic evidence into runtime/production evidence.
 
-This ledger records public findings and verdicts only. It does not contain private reasoning.
+This file is the public review ledger written after the semantic candidate was frozen. It records findings and verdicts, not private reasoning.
 
 ## Candidate receipt
 
 ```yaml
 candidate_id: FS-CONTROL-PLANE-BOOTSTRAP-001
 repository: ed3c/Full-Stack-Notes
+pull_request: 1
 base_subject: a88bc30741bdf54ad9c54203b126221232baa9cc
-head_subject: TO_BE_BOUND_TO_FINAL_DRAFT_PR_HEAD
+reviewed_semantic_head: b4ade829ae71c8c33271a81a9ffebe61ca0a2886
+review_record_note: this ledger commit is an administrative review artifact after the semantic candidate; the PR review binds the final PR head
+convergence_issue: 2
 semantic_delta:
   - define Full Stack Seed role evidence model
-  - define Delivery Pulse MVP architecture and requirement DAG
+  - define Delivery Pulse MVP architecture, contracts and requirement DAG
+  - define molecular issue/Stack topology and path leases
   - define failure, AI-review, licensing and evidence-routing controls
+  - bind every FS requirement to primary and supporting issues
 forbidden_delta:
   - production or professional-experience promotion
   - repository visibility change
   - credential or private-repository disclosure
   - automatic merge, deployment or release authority
 required_gates:
-  - JSON/YAML/OpenAPI/schema parse and semantic checks
-  - internal route/link and requirement reachability
-  - source/license freshness policy
-  - planted false-promotion and hollow-evidence controls
+  - issue 3 JSON/YAML/OpenAPI/schema parse and semantic checks
+  - issue 3 internal route/link and requirement reachability
+  - issues 3 and 15 source/license freshness policy
+  - issues 3 and 11 planted false-promotion and hollow-evidence controls
 runtime_lanes:
   application: NOT_IMPLEMENTED
   ci: NOT_EXERCISED
@@ -40,32 +45,34 @@ runtime_lanes:
 terminal_state: BLOCK
 ```
 
-The exact `head_subject` must be updated after the candidate stops moving. A branch name alone is not an admissible subject.
+A branch name, open issue, merged document or polished portfolio page is not an admissible runtime subject.
 
 ## Global objective
 
-> Produce credible, inspectable evidence that the candidate can own a production-shaped product across React, Node.js, Java, data, asynchronous systems, resilience, operations, and governed AI-assisted development—without fabricating professional experience or confusing design artifacts with executed proof.
+> Produce credible, inspectable evidence that Eeon can own a production-shaped product across React, Node.js, Java, data, asynchronous systems, resilience, operations, and governed AI-assisted development—without fabricating professional experience or confusing design artifacts with executed proof.
 
-## Findings
+## Findings and owning close gates
 
-| ID | Severity | Finding | Why it matters | Required owner / close gate | State |
-|---|---|---|---|---|---|
-| `SHADOW-001` | critical | Delivery Pulse application code is absent | architecture cannot prove engineering ability | vertical-slice implementation issue; browser-to-event acceptance receipt | `OPEN` |
-| `SHADOW-002` | critical | No deterministic root gate exists | documents/contracts can drift or become hollow | CI/verification owner; positive + mutation controls | `OPEN` |
-| `SHADOW-003` | critical | No exact runtime deployment or rollback receipt exists | production claim is ineligible | deployment/game-day owner; immutable image/environment receipt | `OPEN` |
-| `SHADOW-004` | critical | No performance baseline or complete denominator exists | frame/SLO numbers are hypotheses only | performance issue with hardware, dataset, mix, duration and errors | `OPEN` |
-| `SHADOW-005` | critical | Repository cannot manufacture prior professional production leadership | job explicitly values real production ownership | user must supply truthful professional stories; portfolio claims remain separately classified | `OPEN_HUMAN_EVIDENCE` |
-| `SHADOW-006` | high | Next.js web plus separate Fastify BFF may become an unjustified extra hop | duplicated web responsibilities can increase latency and operational surface | ADR after Slice 1 comparing integrated Next edge versus separate BFF | `OPEN` |
-| `SHADOW-007` | high | Kafka and an asynchronous worker can become résumé-driven infrastructure | broker complexity must close a real consistency/lag/replay requirement | keep only after outbox, duplicate, poison, lag and replay controls pass | `OPEN` |
-| `SHADOW-008` | high | Java 21 baseline and Java 25 CI lane need compatibility proof | dual runtime claims can hide unsupported dependencies | Gradle toolchain and CI matrix on exact dependencies | `OPEN` |
-| `SHADOW-009` | high | framework and license choices can change after the observed source date | current correctness is time-dependent | pinned stack manifest, SBOM/license diff and scheduled freshness review | `OPEN` |
-| `SHADOW-010` | high | Google Sheet/Doc URLs are absent | navigation request is not yet closed, but creating them now risks a second truth | create only after canonical fields and first admitted evidence exist | `DEFERRED_WITH_REASON` |
-| `SHADOW-011` | high | private repository evidence routing is policy-only | accidental disclosure or inaccessible proof is possible | sanitized evidence registry and disclosure test before projection | `OPEN` |
-| `SHADOW-012` | medium | initial SLO and frame budgets are uncalibrated | arbitrary targets can reward test-shaping | measure baseline, justify threshold and freeze workload before optimization | `OPEN` |
-| `SHADOW-013` | medium | service discovery/load balancing is not exercised by Compose | one-process documentation cannot prove distributed routing | Phase-2 multi-instance failure receipt; do not add Kubernetes before Slice 1 | `OPEN` |
-| `SHADOW-014` | medium | source articles/PDFs supplied later may contradict current architecture | current design must not silently absorb every proposal | register applicability and contradiction decision per source ID | `OPEN` |
-| `SHADOW-015` | medium | AI-assisted evidence may become prompt theatre | prompt length/tool count do not prove review judgment | planted defects, rejected candidates, mutation tests and human review | `OPEN` |
-| `SHADOW-016` | medium | failure catalogue is broad and can delay the first vertical slice | breadth without a working product weakens evidence | execute the ten minimum stories in dependency order; keep P2 deferred | `OPEN` |
+| ID | Severity | Finding | Owning issue(s) | State |
+|---|---|---|---:|---|
+| `SHADOW-001` | critical | Delivery Pulse application code is absent | #4, then #5/#6/#7/#8 | `OPEN_OWNED` |
+| `SHADOW-002` | critical | No deterministic root gate or exact-head parser run exists | #3 | `OPEN_OWNED` |
+| `SHADOW-003` | critical | No immutable deployment, rollback or recovery receipt exists | #10, #12 | `OPEN_OWNED` |
+| `SHADOW-004` | critical | No calibrated performance baseline or complete denominator exists | #9 | `OPEN_OWNED` |
+| `SHADOW-005` | critical | A repository cannot manufacture prior professional production ownership | #14 / Human Admit | `OPEN_HUMAN_EVIDENCE` |
+| `SHADOW-006` | high | Separate Next.js and Fastify web layers may be an unjustified extra hop | #7 post-Slice-1 ADR | `OPEN_OWNED` |
+| `SHADOW-007` | high | Kafka/worker complexity may be résumé-driven unless it closes real async failures | #8 | `OPEN_OWNED` |
+| `SHADOW-008` | high | Java 21 baseline and Java 25 compatibility lane need exact dependency/runtime proof | #3, #5 | `OPEN_OWNED` |
+| `SHADOW-009` | high | Framework versions and licenses are time-dependent | #3, #15 | `OPEN_OWNED` |
+| `SHADOW-010` | high | Google Sheet/Doc URLs are absent | #13 | `DEFERRED_WITH_REASON` |
+| `SHADOW-011` | high | Private-repository evidence routing is policy-only | #13 | `OPEN_OWNED` |
+| `SHADOW-012` | medium | Initial SLO and frame budgets are uncalibrated hypotheses | #9 | `OPEN_OWNED` |
+| `SHADOW-013` | medium | Compose does not prove discovery/load balancing/multi-instance failure behavior | #12 | `OPEN_OWNED` |
+| `SHADOW-014` | medium | Future article/PDF/repo sources may conflict with current design | #15 | `OPEN_OWNED` |
+| `SHADOW-015` | medium | AI-assisted evidence may become prompt theatre | #11 | `OPEN_OWNED` |
+| `SHADOW-016` | medium | A broad failure catalogue can delay the first vertical slice | #4 first; #10 only after #9 | `OPEN_OWNED` |
+
+All material findings now have explicit owners. This closes **ownership routing**, not the findings themselves.
 
 ## Applicability review
 
@@ -73,10 +80,10 @@ The exact `head_subject` must be updated after the candidate stops moving. A bra
 
 - React component/state/rendering/performance judgment;
 - Node.js BFF/event-loop/SSE/resource management;
-- Java concurrency, transactions, locks and async processing;
+- Java concurrency, transactions, locks and asynchronous processing;
 - PostgreSQL modelling and schema evolution;
 - Kafka decoupling, ordering boundary and eventual consistency;
-- rate limiting, circuit breaking, load balancing and service readiness;
+- rate limiting, circuit breaking, service discovery/load balancing and readiness;
 - AI task specification, review, correction and workflow scaling;
 - product ambiguity, cross-team bottleneck discovery, teaching and lifecycle ownership.
 
@@ -84,70 +91,101 @@ The exact `head_subject` must be updated after the candidate stops moving. A bra
 
 - Go implementation in addition to Java;
 - microservice count as a hiring metric;
-- Kubernetes/service mesh before a measured need;
+- Kubernetes or service mesh before a measured need;
 - multi-region writes, event sourcing or GraphQL;
-- autonomous AI deployment/merge authority;
-- Google Docs/Sheets as canonical sources;
-- any claim of users, traffic, uptime, savings, production leadership or organizational adoption without direct evidence.
+- autonomous AI merge/deploy/release authority;
+- Google Docs or Sheets as canonical sources;
+- claims of users, traffic, uptime, savings, production leadership or organizational adoption without direct evidence.
 
-## Contradiction checks
+## Contradiction review
 
 ```text
 job says Java OR Go
-  → architecture selects Java; adding Go is not required
+  → Java is selected; adding Go would dilute depth without a separate measured need
 
 job says Node.js AND React
-  → web and BFF have explicit responsibilities; duplication remains an ADR risk
+  → web and BFF responsibilities are explicit, but #7 must prove that the extra hop earns its cost
 
 job says production experience
-  → portfolio can show production-shaped judgment but cannot retroactively create employment history
+  → Delivery Pulse may prove current production-shaped judgment; #14 must supply truthful professional history
 
 job says AI-tool fluency
-  → evidence focuses on constraint quality, review, falsification and correction; not tool logos or prompt volume
+  → #11 measures constraints, review, falsification and correction—not tool logos, prompt length or generated lines
 
 job says distributed systems
-  → start with one domain writer and explicit async boundary; do not equate service count with distributed-system understanding
+  → one domain writer plus a real async boundary is preferred over service-count theatre
+
+user requests Google Doc/Sheet URLs
+  → #13 defers creation until canonical GitHub fields and admitted evidence exist, preventing a second truth
 ```
 
-## Evidence ceiling
+## Issue and Stack review
 
-At candidate bootstrap, the maximum truthful statement is:
+The candidate now contains:
 
-> The repository contains a reviewable, requirement-linked plan and contract for a production-shaped Full Stack Seed portfolio MVP.
+```text
+#3 contract gate
+→ #4 runnable scaffold
+→ #5 Java / #6 React / #7 Node path-disjoint siblings
+→ #8 outbox/Kafka/projection/SSE consistency
+→ #9 exact observability/performance denominator
+→ #10 failure/recovery and #12 immutable runtime proof
+→ #13 zero-context seed and external projection
+→ #2 convergence and Human Admit
 
-Forbidden statements include:
+independent lanes:
+#11 AI reviewer/falsifier evidence
+#14 authentic professional evidence
+#15 source/applicability/license intake
+```
+
+This topology is acceptable because `docs/architecture/STACK_DAG.md` distinguishes `SIBLING`, `TRUE_CHILD`, `PROCESS_DEPENDENCY`, `EXTERNAL_EVIDENCE` and `HUMAN_EVIDENCE`. Issue chronology is not represented as Git ancestry.
+
+## Current evidence ceiling
+
+The maximum truthful statement is:
+
+> `ed3c/Full-Stack-Notes` contains a requirement-linked, reviewable architecture, contract set, issue DAG and proof plan for a production-shaped Full Stack Seed portfolio MVP.
+
+Forbidden statements remain:
 
 ```text
 MVP is built
+contracts have passed parsers or semantic gates
 production architecture is validated
 system meets the proposed SLOs
 failure recovery works
 AI workflow improves productivity
 team adoption is proven
-candidate has professional Java/Node/React production experience because this repository exists
+this repository establishes professional Java/Node/React production experience
 ```
 
 ## Close sequence
 
 ```text
-freeze requirements/contracts
-→ implement synchronous vertical slice
-→ deterministic and browser gates
-→ add outbox/Kafka/projection/SSE
-→ duplicate/order/poison controls
-→ observability and performance baseline
-→ fault/rollback game-day
-→ independent Shadow re-evaluation on exact subjects
-→ Human Admit for public/interview claims
+#3 execute contract/traceability/falsifier gates
+→ #4 run one synchronous browser-to-database path
+→ #5/#6/#7 close domain, product and web-edge invariants
+→ #8 close duplicate/order/poison/replay behavior
+→ #9 freeze workloads and calibrate budgets
+→ #10 execute failure/recovery/migration stories
+→ #12 deploy immutable multi-instance environment and exercise rollback
+→ #11/#13 prove AI review and zero-context enablement
+→ #14 admit authentic professional stories when available
+→ independent Shadow re-evaluates exact subjects
+→ #2 Human Admit for merge and public/interview claims
 ```
 
 ## Current verdict
 
 ```text
-CONTROL_PLANE_STRUCTURE: CANDIDATE
+CONTROL_PLANE_STRUCTURE: REVIEWED_CANDIDATE
+REQUIREMENT_TO_ISSUE_ROUTING: PASS_ON_REVIEWED_SEMANTIC_HEAD
 GLOBAL_OBJECTIVE: BLOCKED
-DETERMINISTIC_ADMISSION: BLOCKED_PENDING_GATES
+DETERMINISTIC_ADMISSION: BLOCKED_PENDING_ISSUE_3
 RUNTIME_ADMISSION: NOT_EXERCISED
+PROFESSIONAL_EXPERIENCE_ADMISSION: HUMAN_EVIDENCE_REQUIRED
+GOOGLE_SHEET_DOC_PROJECTION: DEFERRED_PENDING_ADMITTED_EVIDENCE
 PORTFOLIO_PROMOTION: NOT_ELIGIBLE
 MERGE_AUTHORITY: HUMAN_ADMIT_REQUIRED
 ```
