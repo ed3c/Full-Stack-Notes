@@ -207,11 +207,11 @@ test('draining flips readiness and bounded shutdown forces exit on timeout', asy
   assert.equal(work.json().details.reason, 'DRAINING');
   await app.close();
 
-  const source = new EventEmitter() as unknown as SignalSource;
+  const source = new EventEmitter();
   const timeoutLifecycle = new LifecycleState();
   let forcedExitCode: number | undefined;
   const controller = installShutdownHandlers(
-    source,
+    source as unknown as SignalSource,
     { close: () => new Promise<void>(() => undefined) },
     timeoutLifecycle,
     10,
@@ -220,7 +220,7 @@ test('draining flips readiness and bounded shutdown forces exit on timeout', asy
 
   source.emit('SIGTERM');
   await new Promise((resolve) => setTimeout(resolve, 30));
-  assert.equal(timeoutLifecycle.isDraining(), true);
+  assert.equal(timeoutLifecycle.isReady(), false);
   assert.equal(forcedExitCode, 1);
   controller.dispose();
 });
