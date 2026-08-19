@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public final class IdempotencyRepository {
+public class IdempotencyRepository {
     private final JdbcClient jdbc;
 
     public IdempotencyRepository(JdbcClient jdbc) {
