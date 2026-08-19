@@ -16,10 +16,12 @@ export interface ClosableServer {
 
 export interface SignalSource {
   once(event: 'SIGTERM' | 'SIGINT', listener: () => void): unknown;
+  off(event: 'SIGTERM' | 'SIGINT', listener: () => void): unknown;
 }
 
 export interface ShutdownController {
   handle(signal: 'SIGTERM' | 'SIGINT'): Promise<void>;
+  dispose(): void;
 }
 
 export function installShutdownHandlers(
@@ -30,6 +32,7 @@ export function installShutdownHandlers(
   forceExit: (code: number) => void = (code) => process.exit(code)
 ): ShutdownController {
   let stopping = false;
+  let disposed = false;
 
   const handle = async (_signal: 'SIGTERM' | 'SIGINT'): Promise<void> => {
     if (stopping) return;
@@ -40,9 +43,20 @@ export function installShutdownHandlers(
     if (!closed) forceExit(1);
   };
 
-  source.once('SIGTERM', () => void handle('SIGTERM'));
-  source.once('SIGINT', () => void handle('SIGINT'));
-  return { handle };
+  const onSigterm = (): void => { void handle('SIGTERM'); };
+  const onSigint = (): void => { void handle('SIGINT'); };
+
+  source.once('SIGTERM', onSigterm);
+  source.once('SIGINT', onSigint);
+
+  const dispose = (): void => {
+    if (disposed) return;
+    disposed = true;
+    source.off('SIGTERM', onSigterm);
+    source.off('SIGINT', onSigint);
+  };
+
+  return { handle, dispose };
 }
 
 async function closeWithin(server: ClosableServer, timeoutMs: number): Promise<boolean> {
