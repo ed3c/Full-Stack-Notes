@@ -33,6 +33,7 @@ class WorkItemServiceIntegrationTest {
     @BeforeEach
     void setUp() {
         executor = Executors.newFixedThreadPool(2);
+        jdbc.sql("DELETE FROM outbox_event").update();
         jdbc.sql("DELETE FROM idempotency_record").update();
         jdbc.sql("DELETE FROM work_item").update();
     }
