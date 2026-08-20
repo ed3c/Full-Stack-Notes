@@ -1,0 +1,38 @@
+name: react-web-ci
+
+on:
+  pull_request:
+    paths:
+      - 'apps/web/**'
+      - 'packages/contracts/openapi.json'
+      - 'scripts/validate_contracts.py'
+      - '.github/workflows/react-web-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24.19.0'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked dependencies
+        working-directory: apps/web
+        run: npm ci --ignore-scripts
+      - name: Verify generated contract boundary, TypeScript, component behavior, and build
+        working-directory: apps/web
+        run: npm run verify
+      - name: Validate frozen shared contracts
+        run: python scripts/validate_contracts.py
+      - name: Enforce web ownership boundary
+        shell: bash
+        run: |
+          if grep -R -n -E "apps/bff|services/work-service|from ['\"](pg|postgres|postgresql)|require\(['\"](pg|postgres|postgresql)|jdbc:|DATABASE_URL|:8080" apps/web/src; then
+            echo 'React web ownership-boundary violation detected'
+            exit 1
+          fi
