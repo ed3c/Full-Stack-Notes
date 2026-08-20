@@ -8,20 +8,38 @@ on:
       - 'scripts/validate_contracts.py'
       - '.github/workflows/react-web-ci.yml'
 
+# Temporary one-time bootstrap permission. After package-lock.json is committed,
+# Tech Lead returns this workflow to contents: read and npm ci.
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   verify:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
       - uses: actions/setup-node@v6
         with:
           node-version: '24.19.0'
-      - name: Bootstrap exact dependency lockfile
+      - name: Generate and commit exact dependency lockfile when absent
+        shell: bash
+        run: |
+          if [[ -f apps/web/package-lock.json ]]; then
+            echo 'package-lock.json already committed'
+            exit 0
+          fi
+          (cd apps/web && npm install --package-lock-only --ignore-scripts)
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add apps/web/package-lock.json
+          git commit -m 'lock React web dependencies'
+          git push origin "HEAD:${{ github.head_ref }}"
+      - name: Install locked dependencies
         working-directory: apps/web
-        run: npm install --ignore-scripts
+        run: npm ci --ignore-scripts
       - name: Verify generated contract boundary, TypeScript, component behavior, and build
         working-directory: apps/web
         run: npm run verify
@@ -34,9 +52,3 @@ jobs:
             echo 'React web ownership-boundary violation detected'
             exit 1
           fi
-      - name: Preserve generated lockfile for deterministic follow-up
-        uses: actions/upload-artifact@v4
-        with:
-          name: react-web-package-lock
-          path: apps/web/package-lock.json
-          if-no-files-found: error
