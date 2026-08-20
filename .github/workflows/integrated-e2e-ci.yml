@@ -19,16 +19,16 @@ jobs:
   verify:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
-    env:
-      SUBJECT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-      RUNTIME_EVIDENCE_DIR: ${{ runner.temp }}/pr5-evidence
     steps:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-          ref: ${{ env.SUBJECT_SHA }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Bind workflow to exact subject head
+        env:
+          SUBJECT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          RUNTIME_EVIDENCE_DIR: ${{ runner.temp }}/pr5-evidence
         run: |
           set -euo pipefail
           actual_sha="$(git rev-parse HEAD)"
@@ -51,6 +51,8 @@ jobs:
           node-version: '24.19.0'
 
       - name: Execute contract-first integrated runtime
+        env:
+          RUNTIME_EVIDENCE_DIR: ${{ runner.temp }}/pr5-evidence
         run: |
           chmod +x infra/integration/prepare-sources.sh infra/integration/runtime.sh
           ./infra/integration/runtime.sh run
@@ -59,9 +61,9 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: pr5-runtime-${{ env.SUBJECT_SHA }}
+          name: pr5-runtime-${{ github.event.pull_request.head.sha || github.sha }}
           if-no-files-found: warn
           retention-days: 14
           path: |
-            ${{ env.RUNTIME_EVIDENCE_DIR }}/**
+            ${{ runner.temp }}/pr5-evidence/**
             .runtime/pr5/logs/**
