@@ -36,3 +36,27 @@ test('create flow is keyboard-operable and form/action controls have accessible 
   assert.deepEqual(createdTitles, ['Keyboard-created item']);
   assert.ok(screen.getByRole('group', { name: 'Actions for Keyboard-created item' }));
 });
+
+test('transition action can be triggered from the keyboard and remains server-confirmed', async () => {
+  const transitions: string[] = [];
+  const api: WorkQueueApi = {
+    list: async () => [OPEN_ITEM],
+    get: async () => OPEN_ITEM,
+    create: async () => OPEN_ITEM,
+    transition: async (_id, _version, action) => {
+      transitions.push(action);
+      return { ...OPEN_ITEM, status: 'IN_PROGRESS', version: 2 };
+    }
+  };
+  const user = userEvent.setup();
+  render(<WorkQueueScreen api={api} idempotencyKeyFactory={() => 'keyboard-transition-key-0001'} />);
+
+  const claim = await screen.findByRole('button', { name: 'Claim' });
+  claim.focus();
+  assert.equal(document.activeElement, claim);
+  await user.keyboard('{Enter}');
+
+  assert.ok(await screen.findByText('IN PROGRESS'));
+  assert.ok(screen.getByText('Version 2'));
+  assert.deepEqual(transitions, ['CLAIM']);
+});
