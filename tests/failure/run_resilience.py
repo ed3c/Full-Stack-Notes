@@ -150,9 +150,9 @@ def group_lag() -> int:
     found = False
     for line in result.stdout.splitlines():
         fields = line.split()
-        if len(fields) >= 5 and fields[0] == "work-item-events.v1" and fields[1].isdigit():
+        if len(fields) >= 6 and fields[0] == "audit-consumer-pr6" and fields[1] == "work-item-events.v1" and fields[2].isdigit():
             try:
-                total += int(fields[4])
+                total += int(fields[5])
                 found = True
             except ValueError:
                 pass
@@ -279,11 +279,6 @@ def drill_f11_load_balancer() -> None:
 
 
 def drill_f11_pool() -> None:
-    lock = compose(
-        "exec", "-T", "postgres", "psql", "-X", "-v", "ON_ERROR_STOP=1", "-U", "workqueue", "-d", "workqueue",
-        "-c", "BEGIN; LOCK TABLE work_item IN ACCESS EXCLUSIVE MODE; SELECT pg_sleep(4); COMMIT;", check=False,
-    )
-    # The synchronous helper above would block. Start a fresh lock asynchronously instead.
     proc = subprocess.Popen(
         ["docker", "compose", "-f", str(COMPOSE), "-p", PROJECT, "exec", "-T", "postgres", "psql", "-X",
          "-v", "ON_ERROR_STOP=1", "-U", "workqueue", "-d", "workqueue", "-c",
@@ -296,7 +291,9 @@ def drill_f11_pool() -> None:
         sys.executable, str(ROOT / "tests/load/http_load.py"), "--url", f"{BFF}/v1/work-items?limit=1",
         "--requests", "32", "--concurrency", "16", "--timeout", "4", "--output", str(output), "--label", "f11-pool",
     ], timeout=30)
-    proc.communicate(timeout=10)
+    lock_stdout, lock_stderr = proc.communicate(timeout=10)
+    if proc.returncode != 0:
+        fail(f"F-11 DB lock process failed: {lock_stderr.strip() or lock_stdout.strip()}")
     load = json.loads(output.read_text(encoding="utf-8"))
     if float(load["errorRate"]) <= 0:
         fail("F-11 DB pool drill did not produce bounded saturation errors")
