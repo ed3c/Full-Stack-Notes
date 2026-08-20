@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { afterEach, test } from 'node:test';
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { userEvent } from '@testing-library/user-event';
 import { ApiClientError, type WorkQueueApi } from '../src/api.js';
 import type { CreateWorkItemRequest, TransitionAction, WorkItem } from '../src/contracts.js';
 import { WorkQueueScreen } from '../src/work-queue.js';
