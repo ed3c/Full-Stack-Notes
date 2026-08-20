@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "repository": "ed3c/Full-Stack-Notes",
+  "integrationBase": {
+    "pullRequest": 32,
+    "role": "java-work-service + transactional-outbox + audit-consumer",
+    "sha": "fcb161363d7b87be5757fdee0fa00007277abacf"
+  },
+  "siblings": {
+    "bff": {
+      "pullRequest": 28,
+      "role": "Node.js BFF",
+      "sha": "1ee2ba05bbd1c5bde5f2c7b6f7e39a41024faf29",
+      "requiredPath": "apps/bff"
+    },
+    "web": {
+      "pullRequest": 29,
+      "role": "React work queue",
+      "sha": "a41f310050934dc182cb4e136a326da48557f24e",
+      "requiredPath": "apps/web"
+    }
+  },
+  "runtimeImages": {
+    "postgres": "postgres:18",
+    "kafka": "apache/kafka:4.2.1"
+  },
+  "evidenceCeiling": "Happy-path runtime evidence only; no resilience, load, SLO, multi-broker, immutable-deployment, or production-traffic claim."
+}
