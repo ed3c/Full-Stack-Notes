@@ -78,6 +78,7 @@ public class WorkItemService {
         );
     }
 
+    @Transactional
     public MutationResult create(String idempotencyKey, CreateCommand command) {
         return create(idempotencyKey, "internal-" + UUID.randomUUID(), command);
     }
@@ -132,6 +133,7 @@ public class WorkItemService {
         );
     }
 
+    @Transactional
     public MutationResult transition(String idempotencyKey, UUID workItemId, long expectedVersion, TransitionAction action) {
         return transition(idempotencyKey, "internal-" + UUID.randomUUID(), workItemId, expectedVersion, action);
     }
