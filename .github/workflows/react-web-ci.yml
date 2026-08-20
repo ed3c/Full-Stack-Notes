@@ -20,14 +20,8 @@ jobs:
         with:
           node-version: '24.19.0'
           cache: npm
-          cache-dependency-path: apps/web/package-lock.sha256
-      - name: Reconstruct and verify pinned lockfile
-        working-directory: apps/web
-        shell: bash
-        run: |
-          npm install --package-lock-only --ignore-scripts
-          sha256sum -c package-lock.sha256
-      - name: Install digest-pinned dependencies
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked dependencies
         working-directory: apps/web
         run: npm ci --ignore-scripts
       - name: Verify generated contract boundary, TypeScript, component behavior, and build
