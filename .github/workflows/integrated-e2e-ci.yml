@@ -19,10 +19,23 @@ jobs:
   verify:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
+    env:
+      SUBJECT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      RUNTIME_EVIDENCE_DIR: ${{ runner.temp }}/pr5-evidence
     steps:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
+          ref: ${{ env.SUBJECT_SHA }}
+
+      - name: Bind workflow to exact subject head
+        run: |
+          set -euo pipefail
+          actual_sha="$(git rev-parse HEAD)"
+          test "$actual_sha" = "$SUBJECT_SHA"
+          mkdir -p "$RUNTIME_EVIDENCE_DIR"
+          printf '{\n  "result": "PASS",\n  "gate": "exact-subject-head",\n  "subjectSha": "%s",\n  "checkedOutSha": "%s"\n}\n' \
+            "$SUBJECT_SHA" "$actual_sha" > "$RUNTIME_EVIDENCE_DIR/subject-receipt.json"
 
       - uses: actions/setup-java@v5
         with:
@@ -38,8 +51,6 @@ jobs:
           node-version: '24.19.0'
 
       - name: Execute contract-first integrated runtime
-        env:
-          RUNTIME_EVIDENCE_DIR: ${{ runner.temp }}/pr5-evidence
         run: |
           chmod +x infra/integration/prepare-sources.sh infra/integration/runtime.sh
           ./infra/integration/runtime.sh run
@@ -48,9 +59,9 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: pr5-runtime-${{ github.sha }}
+          name: pr5-runtime-${{ env.SUBJECT_SHA }}
           if-no-files-found: warn
           retention-days: 14
           path: |
-            ${{ runner.temp }}/pr5-evidence/**
+            ${{ env.RUNTIME_EVIDENCE_DIR }}/**
             .runtime/pr5/logs/**
