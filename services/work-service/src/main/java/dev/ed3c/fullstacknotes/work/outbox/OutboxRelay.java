@@ -2,6 +2,7 @@ package dev.ed3c.fullstacknotes.work.outbox;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,7 @@ public class OutboxRelay {
     private final Duration baseRetryDelay;
     private final String workerId;
 
+    @Autowired
     public OutboxRelay(
             OutboxRepository repository,
             EventPublisher publisher,
