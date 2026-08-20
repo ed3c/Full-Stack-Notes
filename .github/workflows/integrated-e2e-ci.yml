@@ -1,0 +1,56 @@
+name: integrated-e2e-ci
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/integrated-e2e-ci.yml'
+      - 'infra/integration/**'
+      - 'tests/contract/**'
+      - 'tests/e2e/**'
+      - 'packages/contracts/**'
+      - 'services/work-service/**'
+      - 'services/audit-consumer/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: |
+            services/work-service/pom.xml
+            services/audit-consumer/pom.xml
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24.19.0'
+
+      - name: Execute contract-first integrated runtime
+        env:
+          RUNTIME_EVIDENCE_DIR: ${{ runner.temp }}/pr5-evidence
+        run: |
+          chmod +x infra/integration/prepare-sources.sh infra/integration/runtime.sh
+          ./infra/integration/runtime.sh run
+
+      - name: Upload exact-head runtime receipts and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr5-runtime-${{ github.sha }}
+          if-no-files-found: warn
+          retention-days: 14
+          path: |
+            ${{ runner.temp }}/pr5-evidence/**
+            .runtime/pr5/logs/**
