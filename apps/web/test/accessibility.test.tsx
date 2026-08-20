@@ -1,22 +1,21 @@
 import assert from 'node:assert/strict';
 import { afterEach, test } from 'node:test';
 import { cleanup, render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { userEvent } from '@testing-library/user-event';
 import type { WorkQueueApi } from '../src/api.js';
-import type { WorkItem } from '../src/contracts.js';
 import { WorkQueueScreen } from '../src/work-queue.js';
 import { OPEN_ITEM } from './helpers.js';
 
 afterEach(() => cleanup());
 
 test('create flow is keyboard-operable and form/action controls have accessible names', async () => {
-  let created: WorkItem | null = null;
+  const createdTitles: string[] = [];
   const api: WorkQueueApi = {
     list: async () => [],
     get: async () => OPEN_ITEM,
     create: async (request) => {
-      created = { ...OPEN_ITEM, title: request.title, description: request.description ?? null };
-      return created;
+      createdTitles.push(request.title);
+      return { ...OPEN_ITEM, title: request.title, description: request.description ?? null };
     },
     transition: async () => OPEN_ITEM
   };
@@ -34,6 +33,6 @@ test('create flow is keyboard-operable and form/action controls have accessible 
   await user.type(title, 'Keyboard-created item');
   await user.keyboard('{Enter}');
   assert.ok(await screen.findByRole('heading', { name: 'Keyboard-created item' }));
-  assert.equal(created?.title, 'Keyboard-created item');
+  assert.deepEqual(createdTitles, ['Keyboard-created item']);
   assert.ok(screen.getByRole('group', { name: 'Actions for Keyboard-created item' }));
 });
