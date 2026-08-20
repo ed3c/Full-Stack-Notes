@@ -43,6 +43,28 @@ test('older list response cannot overwrite a newer refresh result', async () => 
   assert.ok(screen.getByText('Fresh server result'));
 });
 
+test('list response started before a confirmed mutation cannot roll back the mutation', async () => {
+  const initialList = deferred<WorkItem[]>();
+  const created = { ...OPEN_ITEM, title: 'Confirmed after load started', version: 1 };
+  const api = inertApi({
+    list: () => initialList.promise,
+    create: async () => created
+  });
+  const user = userEvent.setup();
+  render(<WorkQueueScreen api={api} idempotencyKeyFactory={keyFactory} />);
+
+  await screen.findByText('Loading queue…');
+  await user.type(screen.getByLabelText('Title'), created.title);
+  await user.keyboard('{Enter}');
+  assert.ok(await screen.findByRole('heading', { name: created.title }));
+
+  initialList.resolve([]);
+  await new Promise((resolve) => setTimeout(resolve, 0));
+
+  assert.ok(screen.getByRole('heading', { name: created.title }));
+  assert.equal(screen.queryByText('No work items yet.'), null);
+});
+
 test('failed create shows pending state but never inserts a false confirmed item', async () => {
   const createResult = deferred<WorkItem>();
   const api = inertApi({ create: () => createResult.promise });
