@@ -1,0 +1,24 @@
+{
+  "name": "@ed3c/full-stack-notes-bff",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.19.0 <25"
+  },
+  "packageManager": "npm@11.17.0",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && node --test dist/test/*.test.js",
+    "verify": "npm run check && npm test",
+    "start": "node dist/src/server.js"
+  },
+  "dependencies": {
+    "fastify": "5.10.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.3.0",
+    "typescript": "6.0.3"
+  }
+}
