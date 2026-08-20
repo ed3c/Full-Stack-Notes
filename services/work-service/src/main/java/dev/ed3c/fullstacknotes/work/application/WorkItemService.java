@@ -5,8 +5,11 @@ import dev.ed3c.fullstacknotes.work.domain.TransitionAction;
 import dev.ed3c.fullstacknotes.work.domain.WorkItem;
 import dev.ed3c.fullstacknotes.work.domain.WorkItemStateMachine;
 import dev.ed3c.fullstacknotes.work.domain.WorkItemStatus;
+import dev.ed3c.fullstacknotes.work.messaging.WorkItemEventFactory;
+import dev.ed3c.fullstacknotes.work.outbox.OutboxRepository;
 import dev.ed3c.fullstacknotes.work.persistence.IdempotencyRepository;
 import dev.ed3c.fullstacknotes.work.persistence.WorkItemRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.json.JsonMapper;
@@ -30,21 +33,30 @@ public class WorkItemService {
     private final IdempotencyRepository idempotency;
     private final WorkItemStateMachine stateMachine;
     private final JsonMapper jsonMapper;
+    private final OutboxRepository outbox;
+    private final WorkItemEventFactory events;
+    private final String eventTopic;
 
     public WorkItemService(
             WorkItemRepository workItems,
             IdempotencyRepository idempotency,
             WorkItemStateMachine stateMachine,
-            JsonMapper jsonMapper
+            JsonMapper jsonMapper,
+            OutboxRepository outbox,
+            WorkItemEventFactory events,
+            @Value("${work-events.topic:work-item-events.v1}") String eventTopic
     ) {
         this.workItems = workItems;
         this.idempotency = idempotency;
         this.stateMachine = stateMachine;
         this.jsonMapper = jsonMapper;
+        this.outbox = outbox;
+        this.events = events;
+        this.eventTopic = eventTopic;
     }
 
     @Transactional
-    public MutationResult create(String idempotencyKey, CreateCommand command) {
+    public MutationResult create(String idempotencyKey, String requestId, CreateCommand command) {
         Objects.requireNonNull(command, "command");
         validateIdempotencyKey(idempotencyKey);
 
@@ -58,19 +70,17 @@ public class WorkItemService {
                 fingerprint,
                 () -> {
                     Instant now = Instant.now();
-                    WorkItem item = new WorkItem(
-                            UUID.randomUUID(),
-                            title,
-                            description,
-                            WorkItemStatus.OPEN,
-                            1,
-                            now,
-                            now
-                    );
+                    WorkItem item = new WorkItem(UUID.randomUUID(), title, description, WorkItemStatus.OPEN, 1, now, now);
                     workItems.insert(item);
+                    outbox.insert(events.created(item, requestId, idempotencyKey), eventTopic);
                     return item;
                 }
         );
+    }
+
+    @Transactional
+    public MutationResult create(String idempotencyKey, CreateCommand command) {
+        return create(idempotencyKey, "internal-" + UUID.randomUUID(), command);
     }
 
     @Transactional(readOnly = true)
@@ -89,6 +99,7 @@ public class WorkItemService {
     @Transactional
     public MutationResult transition(
             String idempotencyKey,
+            String requestId,
             UUID workItemId,
             long expectedVersion,
             TransitionAction action
@@ -101,12 +112,7 @@ public class WorkItemService {
             throw new DomainException.InvalidRequest("transition action is required");
         }
 
-        String fingerprint = fingerprint(
-                TRANSITION_OPERATION,
-                workItemId.toString(),
-                Long.toString(expectedVersion),
-                action.name()
-        );
+        String fingerprint = fingerprint(TRANSITION_OPERATION, workItemId.toString(), Long.toString(expectedVersion), action.name());
 
         return executeIdempotent(
                 idempotencyKey,
@@ -118,20 +124,21 @@ public class WorkItemService {
                     if (current.version() != expectedVersion) {
                         throw new DomainException.VersionConflict(workItemId, expectedVersion);
                     }
-
                     WorkItemStatus next = stateMachine.apply(current.status(), action);
-                    return workItems.updateStatus(workItemId, expectedVersion, next)
+                    WorkItem updated = workItems.updateStatus(workItemId, expectedVersion, next)
                             .orElseThrow(() -> new DomainException.VersionConflict(workItemId, expectedVersion));
+                    outbox.insert(events.transitioned(current, updated, action, requestId, idempotencyKey), eventTopic);
+                    return updated;
                 }
         );
     }
 
-    private MutationResult executeIdempotent(
-            String key,
-            String operation,
-            String fingerprint,
-            Supplier<WorkItem> mutation
-    ) {
+    @Transactional
+    public MutationResult transition(String idempotencyKey, UUID workItemId, long expectedVersion, TransitionAction action) {
+        return transition(idempotencyKey, "internal-" + UUID.randomUUID(), workItemId, expectedVersion, action);
+    }
+
+    private MutationResult executeIdempotent(String key, String operation, String fingerprint, Supplier<WorkItem> mutation) {
         if (!idempotency.reserve(key, operation, fingerprint)) {
             IdempotencyRepository.IdempotencyRecord existing = idempotency.find(key)
                     .orElseThrow(() -> new IllegalStateException("idempotency conflict row disappeared for key " + key));
@@ -166,26 +173,16 @@ public class WorkItemService {
     }
 
     private static String normalizeTitle(String title) {
-        if (title == null) {
-            throw new DomainException.InvalidRequest("title is required");
-        }
+        if (title == null) throw new DomainException.InvalidRequest("title is required");
         String normalized = title.trim();
-        if (normalized.isEmpty()) {
-            throw new DomainException.InvalidRequest("title must not be blank");
-        }
-        if (normalized.length() > 200) {
-            throw new DomainException.InvalidRequest("title must be at most 200 characters");
-        }
+        if (normalized.isEmpty()) throw new DomainException.InvalidRequest("title must not be blank");
+        if (normalized.length() > 200) throw new DomainException.InvalidRequest("title must be at most 200 characters");
         return normalized;
     }
 
     private static String normalizeDescription(String description) {
-        if (description == null) {
-            return null;
-        }
-        if (description.length() > 4000) {
-            throw new DomainException.InvalidRequest("description must be at most 4000 characters");
-        }
+        if (description == null) return null;
+        if (description.length() > 4000) throw new DomainException.InvalidRequest("description must be at most 4000 characters");
         return description;
     }
 
@@ -210,12 +207,7 @@ public class WorkItemService {
     }
 
     private static byte[] intBytes(int value) {
-        return new byte[]{
-                (byte) (value >>> 24),
-                (byte) (value >>> 16),
-                (byte) (value >>> 8),
-                (byte) value
-        };
+        return new byte[]{(byte) (value >>> 24), (byte) (value >>> 16), (byte) (value >>> 8), (byte) value};
     }
 
     public record CreateCommand(String title, String description) {

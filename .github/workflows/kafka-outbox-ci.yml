@@ -1,0 +1,78 @@
+name: kafka-outbox-ci
+
+on:
+  pull_request:
+    paths:
+      - 'services/work-service/**'
+      - 'services/audit-consumer/**'
+      - 'packages/contracts/events/**'
+      - 'scripts/validate_contracts.py'
+      - '.github/workflows/kafka-outbox-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_DB: workqueue
+          POSTGRES_USER: workqueue
+          POSTGRES_PASSWORD: workqueue
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U workqueue -d workqueue"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: jdbc:postgresql://127.0.0.1:5432/workqueue
+      DATABASE_USER: workqueue
+      DATABASE_PASSWORD: workqueue
+      AUDIT_DATABASE_URL: jdbc:postgresql://127.0.0.1:5432/workqueue
+      AUDIT_DATABASE_USER: workqueue
+      AUDIT_DATABASE_PASSWORD: workqueue
+      OUTBOX_RELAY_ENABLED: 'false'
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: |
+            services/work-service/pom.xml
+            services/audit-consumer/pom.xml
+
+      - name: Validate frozen event contract
+        shell: bash
+        run: |
+          python3 scripts/validate_contracts.py
+          git fetch origin agent/pr1-java-work-service --depth=1
+          git diff --exit-code origin/agent/pr1-java-work-service -- packages/contracts/events/work-item-event.schema.json
+
+      - name: Work-service transactional outbox tests
+        run: mvn -B -f services/work-service/pom.xml verify
+
+      - name: Audit consumer Kafka redelivery and DLT tests
+        run: mvn -B -f services/audit-consumer/pom.xml verify
+
+      - name: Enforce async ownership and raw-key boundary
+        shell: bash
+        run: |
+          if grep -R -n -E 'services/work-service|dev\.ed3c\.fullstacknotes\.work' services/audit-consumer/src/main/java; then
+            echo 'audit consumer must not import work-service implementation'
+            exit 1
+          fi
+          if grep -R -n -E 'idempotencyKey"[[:space:]]*:' services/work-service/src/main/java services/audit-consumer/src/main/java; then
+            echo 'raw idempotency key must not be emitted to event JSON'
+            exit 1
+          fi
