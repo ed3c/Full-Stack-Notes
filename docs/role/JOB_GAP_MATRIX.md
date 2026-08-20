@@ -1,47 +1,67 @@
 # Full Stack Seed Engineer — Job Gap Matrix
 
-This matrix translates the supplied job description into evidence that can survive technical follow-up. It does not assert prior experience that has not been documented.
+This matrix translates the supplied role expectations into evidence that can survive technical follow-up. States are **claim-scoped**: a component may be verified while its load, production, or human-admission claim remains open.
 
-| ID | Role expectation | Evidence required | Planned repository proof | Current state |
+| ID | Role expectation | Evidence required | Canonical repository proof | Current evidence state |
 |---|---|---|---|---|
-| FS-01 | End-to-end product delivery | One user outcome crossing UI, BFF, service, DB, async path, tests, deployment/run evidence | Operations Work Queue vertical slice | PROPOSED |
-| FS-02 | Java backend depth | Domain model, concurrency, transactions, idempotency, persistence, tests, profiling/debug evidence | `services/work-service` | PROPOSED |
-| FS-03 | Node.js proficiency | Typed BFF, validation, timeout/retry policy, rate limiting, graceful shutdown, tests | `apps/bff` | PROPOSED |
-| FS-04 | React depth | Component architecture, state/error boundaries, typed API client, test strategy, render/perf evidence | `apps/web` | PROPOSED |
-| FS-05 | Database design | Schema rationale, indexes, constraints, migrations, query-plan evidence, transaction semantics | PostgreSQL schema + ADR + run artifacts | PROPOSED |
-| FS-06 | High concurrency | Reproducible race/concurrency tests, lost-update prevention, saturation behavior | optimistic concurrency + load/failure tests | PROPOSED |
-| FS-07 | Message queue | Durable publish, at-least-once consumption, duplicate handling, lag/recovery drill | outbox + Kafka + audit consumer | PROPOSED |
-| FS-08 | Eventual consistency | Explicit consistency contract and stale/pending UI behavior | command state + audit projection | PROPOSED |
-| FS-09 | Circuit breaking/timeouts | Failure policy with bounded retries, timeout budget, measurable recovery | BFF/Java resilience drills | PROPOSED |
-| FS-10 | Rate limiting | Algorithm/scope rationale and rejection telemetry | BFF limiter + load test | PROPOSED |
-| FS-11 | Load balancing/service discovery concepts | Deployment topology and failure analysis; optional runnable multi-instance test | architecture ADR + runtime drill | PROPOSED |
-| FS-12 | Production ownership | CI/CD, rollout/rollback, dashboards, incident drill, postmortem evidence | deployment and incident runbook artifacts | PROPOSED — not production experience |
-| FS-13 | AI-assisted engineering | Prompt/constraint record, generated diff review, validation, rejected output examples | AI change provenance + review evidence | PROPOSED |
-| FS-14 | Ability to verify AI output | Tests/static analysis/security review catching a seeded or real AI error | AI verification drill | PROPOSED |
-| FS-15 | Product/spec thinking | Ambiguous idea -> problem statement -> acceptance criteria -> shipped behavior | issue/RFC/evidence chain | FOUNDATION_DESIGN |
-| FS-16 | Cross-team boundary reduction | Contract-first API/event ownership and change protocol | `packages/contracts` + stacked PR DAG | FOUNDATION_DESIGN |
-| FS-17 | Full-stack seed/mentoring | Reusable playbook plus evidence another engineer/team successfully used it | adoption/mentoring record | PROPOSED — requires human evidence |
-| FS-18 | Process improvement | Before/after metric for one workflow bottleneck | engineering-flow experiment | PROPOSED |
-| FS-19 | Communication/logical reasoning | ADR tradeoffs, incident timeline, PR reviews, concise interview packet | docs + PR history | PROPOSED |
-| FS-20 | Full product lifecycle | idea -> contract -> implementation -> release/run -> feedback -> iteration | repository state machine | PROPOSED |
+| FS-01 | End-to-end product delivery | One user outcome crossing UI, BFF, service, DB, async path, tests, runnable evidence | Operations Work Queue; PR #33 / #21 | `RUNTIME_EVIDENCE` — one pinned deterministic happy path; not production |
+| FS-02 | Java backend depth | Domain model, concurrency, transactions, idempotency, persistence, tests | `services/work-service`; PR #25/#32 | `VERIFIED` |
+| FS-03 | Node.js proficiency | Typed BFF, validation, timeout/retry policy, rate limiting, graceful shutdown, tests | `apps/bff`; PR #28 | `VERIFIED` — deterministic single-process scope |
+| FS-04 | React depth | Component/state/error boundaries, typed API client, async-race tests, render/perf evidence | `apps/web`; PR #29 | `VERIFIED` for correctness; browser/load/Web-Vitals evidence remains open/deferred |
+| FS-05 | Database design | Schema, constraints, migrations, indexes/query plan, transaction semantics | PostgreSQL schema + Java integration evidence | `VERIFIED` for schema/transaction semantics; F-12 query-plan evidence remains open |
+| FS-06 | High concurrency | Reproducible races plus saturation behavior | Java concurrency tests; #22 F-11 lane | `VERIFIED` for lost-update/idempotency races; saturation `FALSIFICATION_IN_PROGRESS` |
+| FS-07 | Message queue | Durable publish, at-least-once consumption, duplicate handling, lag/recovery | PR #32 + integrated PR #33 | `RUNTIME_EVIDENCE` for one happy path; measured outage/lag convergence remains #22 |
+| FS-08 | Eventual consistency | Explicit consistency contract and stale/pending behavior | outbox/audit semantics + React async-state tests | `VERIFIED` for component semantics; measured async convergence remains #22 |
+| FS-09 | Circuit breaking/timeouts | Bounded retry/deadline policy and measurable failure recovery | BFF policy PR #28; full drills #22 | `VERIFIED` for BFF timeout/retry semantics; runtime recovery remains #22 |
+| FS-10 | Rate limiting | Algorithm/scope rationale, rejection behavior, load/fairness evidence | BFF local token bucket PR #28 | `VERIFIED` single-process rejection semantics; distributed fairness deferred #27 |
+| FS-11 | Load balancing/service discovery concepts | Two service instances behind explicit LB, health/removal/failover observation | PR #34 / #22 | `IMPLEMENTED / FALSIFICATION_IN_PROGRESS`; latest exact-head run fails before drill admission |
+| FS-12 | Production ownership | CI/CD, rollout/rollback, dashboards, incident evidence from real operations | local/CI runbooks + #22/#23/#27 | `NOT_ADMITTED` as production experience; simulation/runtime work cannot manufacture production ownership |
+| FS-13 | AI-assisted engineering | Prompt/constraint provenance, generated diff review, rejected output examples | governance + #22 AI verification target | `IMPLEMENTED` process scaffolding; interview admission pending exact verification evidence |
+| FS-14 | Ability to verify AI output | Test/static/security evidence catching a plausible AI error | #22 minimum drill set | `IMPLEMENTED / FALSIFICATION_IN_PROGRESS`; not admitted yet |
+| FS-15 | Product/spec thinking | Ambiguous idea -> problem statement -> acceptance criteria -> shipped behavior | #16-#21 issue/PR chain | `VERIFIED` as repository delivery/spec traceability; not a claim about prior employer work |
+| FS-16 | Cross-team boundary reduction | Contract-first API/event ownership and change protocol | `packages/contracts` + Stack PR DAG | `VERIFIED` in repository workflow |
+| FS-17 | Full-stack seed/mentoring | Reusable playbook plus evidence another engineer/team used it | #23/#27 human lane | `PROPOSED / HUMAN_EVIDENCE_REQUIRED` |
+| FS-18 | Process improvement | Before/after metric for a real workflow bottleneck | future engineering-flow experiment / #23 | `PROPOSED` |
+| FS-19 | Communication/logical reasoning | ADR tradeoffs, failure/debug records, PR reviews, concise packet | architecture docs + PR/issue audits | `VERIFIED` as repository artifacts; human interview admission pending #23 |
+| FS-20 | Full product lifecycle | idea -> contract -> implementation -> run -> failure/feedback -> iteration | state machine + merged PR #24-#33 | `RUNTIME_EVIDENCE` for portfolio implementation/run; production lifecycle and human admission remain open |
+
+## What is closed versus still open
+
+### Closed at current evidence ceiling
+
+- Contract-first full-stack architecture and ownership boundaries.
+- Java transaction/idempotency/optimistic-concurrency behavior.
+- Node BFF typed boundary, request correlation, bounded retry/deadline, local rate limiting, and graceful-shutdown semantics.
+- React stale-response/conflict/error-state correctness.
+- Transactional outbox, at-least-once duplicate integrity, audit projection and DLT component behavior.
+- One deterministic pinned React -> BFF -> Java -> PostgreSQL -> outbox -> Kafka -> audit-consumer runtime path.
+
+### Not closed
+
+- #22 resilience/load/observability admission: DB pool saturation/recovery, two-instance load balancing/failover, Kafka lag convergence, correlated synchronous/asynchronous fault telemetry, load distribution/error/saturation receipts, and one AI-verification drill.
+- F-12 representative query-plan/index evidence.
+- Production SLO/capacity/on-call/incident ownership.
+- Real mentoring/organizational adoption.
+- Before/after process improvement metric.
+- #30 release-shape-dependent third-party license/NOTICE/SBOM obligations.
 
 ## Admission rules
 
 ### Technical capability
 
-A capability may move to `VERIFIED` only when automated checks and the relevant failure/edge scenario exist. Code presence alone is `IMPLEMENTED`.
+A capability may move to `VERIFIED` only when automated checks and the relevant deterministic edge/failure behavior exist. Code presence alone is `IMPLEMENTED`.
 
 ### Runtime behavior
 
-A capability may move to `RUNTIME_EVIDENCE` only when a reproducible run records environment, command/workflow, input, result, and artifact path.
+A capability may move to `RUNTIME_EVIDENCE` only when a reproducible run records environment, exact subject, command/workflow, input, result, and immutable artifact/receipt. One happy-path runtime receipt does not imply resilience/load evidence.
 
 ### Production experience
 
-Local Docker, CI, staging, synthetic load, chaos/failure drills, and portfolio users are useful engineering evidence but are not equivalent to owning a real production system. Production claims must cite real employer/project evidence the user is allowed to discuss.
+Local Docker, CI, synthetic load, chaos/failure drills, and portfolio users are useful engineering evidence but are not equivalent to owning a real production system. Production claims require real project/employer evidence the user is allowed to discuss.
 
 ### Mentoring and organizational adoption
 
-A document saying "this can scale to the organization" is not evidence. Admission requires a human adoption signal: review, usage, contribution, training feedback, or measurable workflow change.
+A document saying "this can scale to the organization" is not evidence. Admission requires a genuine human adoption signal: review, usage, contribution, training feedback, or measurable workflow change.
 
 ## Interview evidence packet target
 
@@ -56,3 +76,5 @@ For each admitted capability, prepare a compact packet:
 7. measured result;
 8. what would change at 10x scale;
 9. exact repository/CI evidence link.
+
+#23 owns final admission. It may package existing evidence but cannot promote unsupported production, mentoring, adoption, or organizational claims.
