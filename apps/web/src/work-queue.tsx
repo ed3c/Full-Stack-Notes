@@ -131,7 +131,7 @@ export const WorkItemRow = memo(function WorkItemRow({ item, pending, onTransiti
         {item.description !== null && <p>{item.description}</p>}
         <p className="meta">Version {item.version}{pending ? ' · Updating…' : ''}</p>
       </div>
-      <div className="actions" aria-label={`Actions for ${item.title}`}>
+      <div className="actions" role="group" aria-label={`Actions for ${item.title}`}>
         {actions.map((action) => (
           <button
             key={action}
