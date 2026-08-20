@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: audit-consumer
+  datasource:
+    url: ${AUDIT_DATABASE_URL:jdbc:postgresql://localhost:5432/workqueue}
+    username: ${AUDIT_DATABASE_USER:workqueue}
+    password: ${AUDIT_DATABASE_PASSWORD:workqueue}
+  flyway:
+    enabled: true
+    create-schemas: true
+    schemas: audit
+    default-schema: audit
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      enable-auto-commit: false
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      acks: all
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+audit:
+  topic: ${AUDIT_TOPIC:work-item-events.v1}
+  group-id: ${AUDIT_GROUP_ID:audit-consumer-v1}

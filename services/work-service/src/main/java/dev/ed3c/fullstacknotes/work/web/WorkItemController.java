@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,11 +40,13 @@ public final class WorkItemController {
 
     @PostMapping
     public ResponseEntity<WorkItem> create(
+            @RequestAttribute(RequestIdFilter.ATTRIBUTE) String requestId,
             @RequestHeader(name = "Idempotency-Key", required = false) String idempotencyKey,
             @RequestBody CreateWorkItemRequest request
     ) {
         WorkItemService.MutationResult result = service.create(
                 idempotencyKey,
+                requestId,
                 new WorkItemService.CreateCommand(request.title(), request.description())
         );
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -53,6 +56,7 @@ public final class WorkItemController {
 
     @PostMapping("/{workItemId}/transitions")
     public ResponseEntity<WorkItem> transition(
+            @RequestAttribute(RequestIdFilter.ATTRIBUTE) String requestId,
             @PathVariable UUID workItemId,
             @RequestHeader(name = "Idempotency-Key", required = false) String idempotencyKey,
             @RequestHeader(name = "If-Match", required = false) String ifMatch,
@@ -61,6 +65,7 @@ public final class WorkItemController {
         long expectedVersion = parseVersion(ifMatch);
         WorkItemService.MutationResult result = service.transition(
                 idempotencyKey,
+                requestId,
                 workItemId,
                 expectedVersion,
                 request.action()

@@ -15,6 +15,29 @@ spring:
       connection-timeout: ${DB_CONNECTION_TIMEOUT_MS:2000}
   flyway:
     enabled: true
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      acks: all
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        enable.idempotence: true
+        delivery.timeout.ms: ${KAFKA_DELIVERY_TIMEOUT_MS:5000}
+        request.timeout.ms: ${KAFKA_REQUEST_TIMEOUT_MS:3000}
+        max.block.ms: ${KAFKA_MAX_BLOCK_MS:3000}
+
+work-events:
+  topic: ${WORK_EVENTS_TOPIC:work-item-events.v1}
+
+outbox:
+  relay:
+    enabled: ${OUTBOX_RELAY_ENABLED:true}
+    fixed-delay-ms: ${OUTBOX_RELAY_FIXED_DELAY_MS:500}
+    batch-size: ${OUTBOX_RELAY_BATCH_SIZE:20}
+    lease-seconds: ${OUTBOX_RELAY_LEASE_SECONDS:30}
+    retry-base-ms: ${OUTBOX_RELAY_RETRY_BASE_MS:250}
+    send-timeout-ms: ${OUTBOX_RELAY_SEND_TIMEOUT_MS:3000}
 
 logging:
   pattern:
