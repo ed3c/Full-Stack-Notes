@@ -1,0 +1,72 @@
+name: resilience-evidence-ci
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/resilience-evidence-ci.yml'
+      - 'infra/resilience/**'
+      - 'infra/integration/**'
+      - 'tests/failure/**'
+      - 'tests/load/**'
+      - 'tests/contract/**'
+      - 'tests/e2e/**'
+      - 'docs/runbooks/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Bind workflow to exact subject head
+        env:
+          SUBJECT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          RUNTIME_EVIDENCE_DIR: ${{ runner.temp }}/pr6-evidence
+        run: |
+          set -euo pipefail
+          actual_sha="$(git rev-parse HEAD)"
+          test "$actual_sha" = "$SUBJECT_SHA"
+          mkdir -p "$RUNTIME_EVIDENCE_DIR"
+          printf '{\n  "result": "PASS",\n  "gate": "exact-subject-head",\n  "subjectSha": "%s",\n  "checkedOutSha": "%s"\n}\n' \
+            "$SUBJECT_SHA" "$actual_sha" > "$RUNTIME_EVIDENCE_DIR/subject-receipt.json"
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: |
+            services/work-service/pom.xml
+            services/audit-consumer/pom.xml
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24.19.0'
+
+      - name: Execute resilience, load, and observability drills
+        env:
+          RUNTIME_EVIDENCE_DIR: ${{ runner.temp }}/pr6-evidence
+          PR6_BASE_SHA: c8e644fbd85cf495bc11b7954c38ef075d828702
+        run: |
+          chmod +x infra/integration/prepare-sources.sh infra/integration/runtime.sh infra/resilience/runtime.sh
+          chmod +x tests/load/http_load.py tests/failure/run_resilience.py
+          ./infra/resilience/runtime.sh run
+
+      - name: Upload exact-head resilience receipts and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr6-resilience-${{ github.event.pull_request.head.sha || github.sha }}
+          if-no-files-found: warn
+          retention-days: 14
+          path: |
+            ${{ runner.temp }}/pr6-evidence/**
+            .runtime/pr6/logs/**
