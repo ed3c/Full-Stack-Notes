@@ -50,7 +50,7 @@ public class OutboxRelay {
         this.workerId = workerId;
     }
 
-    @Scheduled(fixedDelayString = "${outbox.relay.fixed-delay-ms:500}")
+    @Scheduled(fixedDelayString = "${outbox.relay.fixed-delay:PT0.5S}")
     public void scheduledPublish() {
         if (enabled) {
             publishOnce();
