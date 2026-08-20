@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Component
 public final class RequestIdFilter extends OncePerRequestFilter {
-    public static final String ATTRIBUTE = RequestIdFilter.class.getName() + ".requestId";
+    public static final String ATTRIBUTE = "dev.ed3c.fullstacknotes.work.web.RequestIdFilter.requestId";
     public static final String HEADER = "X-Request-Id";
 
     @Override
