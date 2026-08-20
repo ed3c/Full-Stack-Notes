@@ -41,10 +41,21 @@ services:
       timeout: 5s
       retries: 40
 
+  evidence-init:
+    image: nginx:1.28.0-alpine
+    user: "0:0"
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["chmod 0777 /evidence"]
+    volumes:
+      - ${PR6_EVIDENCE_DIR:-../../.runtime/pr6/evidence}:/evidence
+
   nginx:
     image: nginx:1.28.0-alpine
     depends_on:
-      - postgres
+      postgres:
+        condition: service_started
+      evidence-init:
+        condition: service_completed_successfully
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
@@ -68,7 +79,10 @@ services:
     image: otel/opentelemetry-collector-contrib:0.159.0
     command: ["--config=/etc/otelcol/config.yml"]
     depends_on:
-      - jaeger
+      jaeger:
+        condition: service_started
+      evidence-init:
+        condition: service_completed_successfully
     ports:
       - "14317:4317"
       - "14318:4318"
