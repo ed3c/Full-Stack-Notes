@@ -1,0 +1,33 @@
+name: foundation-ci
+
+on:
+  pull_request:
+    paths:
+      - "packages/contracts/**"
+      - "scripts/validate_contracts.py"
+      - ".github/workflows/foundation-ci.yml"
+  push:
+    branches: [main]
+    paths:
+      - "packages/contracts/**"
+      - "scripts/validate_contracts.py"
+      - ".github/workflows/foundation-ci.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  contract-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Parse contracts
+        run: |
+          python -m json.tool packages/contracts/openapi.json >/dev/null
+          python -m json.tool packages/contracts/events/work-item-event.schema.json >/dev/null
+      - name: Verify role-critical contract invariants
+        run: python scripts/validate_contracts.py

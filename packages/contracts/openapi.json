@@ -1,0 +1,222 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Operations Work Queue API",
+    "version": "0.1.0",
+    "description": "Contract-first API for the Full-Stack-Notes production-shaped vertical slice."
+  },
+  "servers": [
+    {"url": "http://localhost:8080"}
+  ],
+  "paths": {
+    "/v1/work-items": {
+      "get": {
+        "operationId": "listWorkItems",
+        "parameters": [
+          {"$ref": "#/components/parameters/RequestId"},
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {"type": "integer", "minimum": 1, "maximum": 100, "default": 50}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Work items",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["items"],
+                  "properties": {
+                    "items": {"type": "array", "items": {"$ref": "#/components/schemas/WorkItem"}}
+                  }
+                }
+              }
+            }
+          },
+          "500": {"$ref": "#/components/responses/InternalError"}
+        }
+      },
+      "post": {
+        "operationId": "createWorkItem",
+        "parameters": [
+          {"$ref": "#/components/parameters/RequestId"},
+          {"$ref": "#/components/parameters/IdempotencyKey"}
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {"schema": {"$ref": "#/components/schemas/CreateWorkItemRequest"}}
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created or replayed result for the same idempotent request",
+            "headers": {
+              "Idempotency-Replayed": {
+                "schema": {"type": "boolean"},
+                "description": "True when the stored result for the same key and request fingerprint is returned."
+              }
+            },
+            "content": {
+              "application/json": {"schema": {"$ref": "#/components/schemas/WorkItem"}}
+            }
+          },
+          "400": {"$ref": "#/components/responses/BadRequest"},
+          "409": {"$ref": "#/components/responses/Conflict"},
+          "500": {"$ref": "#/components/responses/InternalError"}
+        }
+      }
+    },
+    "/v1/work-items/{workItemId}": {
+      "get": {
+        "operationId": "getWorkItem",
+        "parameters": [
+          {"$ref": "#/components/parameters/RequestId"},
+          {"$ref": "#/components/parameters/WorkItemId"}
+        ],
+        "responses": {
+          "200": {
+            "description": "Work item",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/WorkItem"}}}
+          },
+          "404": {"$ref": "#/components/responses/NotFound"},
+          "500": {"$ref": "#/components/responses/InternalError"}
+        }
+      }
+    },
+    "/v1/work-items/{workItemId}/transitions": {
+      "post": {
+        "operationId": "transitionWorkItem",
+        "description": "Applies one domain transition using optimistic version checking.",
+        "parameters": [
+          {"$ref": "#/components/parameters/RequestId"},
+          {"$ref": "#/components/parameters/IdempotencyKey"},
+          {"$ref": "#/components/parameters/WorkItemId"},
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "description": "Current integer work-item version encoded as a string.",
+            "schema": {"type": "string", "pattern": "^[0-9]+$"}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {"schema": {"$ref": "#/components/schemas/TransitionWorkItemRequest"}}
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Transition applied",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/WorkItem"}}}
+          },
+          "400": {"$ref": "#/components/responses/BadRequest"},
+          "404": {"$ref": "#/components/responses/NotFound"},
+          "409": {"$ref": "#/components/responses/Conflict"},
+          "500": {"$ref": "#/components/responses/InternalError"}
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "RequestId": {
+        "name": "X-Request-Id",
+        "in": "header",
+        "required": false,
+        "schema": {"type": "string", "minLength": 1, "maxLength": 128}
+      },
+      "IdempotencyKey": {
+        "name": "Idempotency-Key",
+        "in": "header",
+        "required": true,
+        "schema": {"type": "string", "minLength": 8, "maxLength": 128}
+      },
+      "WorkItemId": {
+        "name": "workItemId",
+        "in": "path",
+        "required": true,
+        "schema": {"type": "string", "format": "uuid"}
+      }
+    },
+    "schemas": {
+      "WorkItemStatus": {
+        "type": "string",
+        "enum": ["OPEN", "IN_PROGRESS", "DONE", "CANCELLED"]
+      },
+      "WorkItem": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title", "status", "version", "createdAt", "updatedAt"],
+        "properties": {
+          "id": {"type": "string", "format": "uuid"},
+          "title": {"type": "string", "minLength": 1, "maxLength": 200},
+          "description": {"type": ["string", "null"], "maxLength": 4000},
+          "status": {"$ref": "#/components/schemas/WorkItemStatus"},
+          "version": {"type": "integer", "minimum": 1},
+          "createdAt": {"type": "string", "format": "date-time"},
+          "updatedAt": {"type": "string", "format": "date-time"}
+        }
+      },
+      "CreateWorkItemRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["title"],
+        "properties": {
+          "title": {"type": "string", "minLength": 1, "maxLength": 200},
+          "description": {"type": ["string", "null"], "maxLength": 4000}
+        }
+      },
+      "TransitionWorkItemRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["action"],
+        "properties": {
+          "action": {"type": "string", "enum": ["CLAIM", "COMPLETE", "RELEASE", "CANCEL"]}
+        }
+      },
+      "ApiError": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "message", "requestId"],
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "VALIDATION_ERROR",
+              "NOT_FOUND",
+              "IDEMPOTENCY_CONFLICT",
+              "VERSION_CONFLICT",
+              "INVALID_TRANSITION",
+              "INTERNAL_ERROR"
+            ]
+          },
+          "message": {"type": "string"},
+          "requestId": {"type": "string"},
+          "details": {"type": ["object", "null"], "additionalProperties": true}
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Invalid input",
+        "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ApiError"}}}
+      },
+      "NotFound": {
+        "description": "Resource not found",
+        "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ApiError"}}}
+      },
+      "Conflict": {
+        "description": "Idempotency, optimistic-version, or domain-transition conflict",
+        "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ApiError"}}}
+      },
+      "InternalError": {
+        "description": "Unexpected failure",
+        "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ApiError"}}}
+      }
+    }
+  }
+}

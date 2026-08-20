@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://full-stack-notes.local/contracts/work-item-event.schema.json",
+  "title": "WorkItemEvent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["eventId", "eventType", "schemaVersion", "occurredAt", "aggregateId", "aggregateVersion", "traceId", "payload"],
+  "properties": {
+    "eventId": {"type": "string", "format": "uuid"},
+    "eventType": {
+      "type": "string",
+      "enum": ["WorkItemCreated", "WorkItemTransitioned"]
+    },
+    "schemaVersion": {"const": 1},
+    "occurredAt": {"type": "string", "format": "date-time"},
+    "aggregateId": {"type": "string", "format": "uuid"},
+    "aggregateVersion": {"type": "integer", "minimum": 1},
+    "traceId": {"type": "string", "minLength": 1, "maxLength": 128},
+    "requestId": {"type": ["string", "null"], "maxLength": 128},
+    "idempotencyKeyHash": {
+      "type": ["string", "null"],
+      "description": "Optional irreversible identifier for correlation. Raw idempotency keys must not be emitted to the event stream."
+    },
+    "payload": {
+      "oneOf": [
+        {"$ref": "#/$defs/createdPayload"},
+        {"$ref": "#/$defs/transitionedPayload"}
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"eventType": {"const": "WorkItemCreated"}},
+        "required": ["eventType"]
+      },
+      "then": {
+        "properties": {"payload": {"$ref": "#/$defs/createdPayload"}}
+      }
+    },
+    {
+      "if": {
+        "properties": {"eventType": {"const": "WorkItemTransitioned"}},
+        "required": ["eventType"]
+      },
+      "then": {
+        "properties": {"payload": {"$ref": "#/$defs/transitionedPayload"}}
+      }
+    }
+  ],
+  "$defs": {
+    "status": {
+      "type": "string",
+      "enum": ["OPEN", "IN_PROGRESS", "DONE", "CANCELLED"]
+    },
+    "createdPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "title", "status"],
+      "properties": {
+        "kind": {"const": "created"},
+        "title": {"type": "string", "minLength": 1, "maxLength": 200},
+        "status": {"const": "OPEN"}
+      }
+    },
+    "transitionedPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "fromStatus", "toStatus", "action"],
+      "properties": {
+        "kind": {"const": "transitioned"},
+        "fromStatus": {"$ref": "#/$defs/status"},
+        "toStatus": {"$ref": "#/$defs/status"},
+        "action": {"type": "string", "enum": ["CLAIM", "COMPLETE", "RELEASE", "CANCEL"]}
+      }
+    }
+  }
+}
