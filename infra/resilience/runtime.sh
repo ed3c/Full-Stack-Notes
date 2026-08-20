@@ -82,6 +82,7 @@ kill_processes() {
 
 java_env() {
   local service_name="$1" instance_id="$2"
+  shift 2
   env \
     JAVA_TOOL_OPTIONS="-javaagent:${OTEL_AGENT}" \
     OTEL_SERVICE_NAME="$service_name" \
@@ -243,6 +244,6 @@ case "${1:-run}" in
   stop-work-1) stop_named work-service-1 ;;
   start-work-1) start_work 1 ;;
   stop-kafka) compose stop kafka ;;
-  start-kafka) compose start kafka; wait_http http://127.0.0.1:8474/version toxiproxy >/dev/null ;;
+  start-kafka) compose start kafka ;;
   *) echo "usage: $0 {prepare|up|down|logs|run|stop-audit|start-audit|stop-work-1|start-work-1|stop-kafka|start-kafka}" >&2; exit 2 ;;
 esac
